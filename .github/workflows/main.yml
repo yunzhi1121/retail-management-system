@@ -39,7 +39,7 @@ jobs:
 
       # 构建项目
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean install 
 
       # 执行测试
       - name: Run tests
