@@ -97,53 +97,47 @@
 
 ## 6. 后端框架设置
 
-1. 初始化 Spring Boot 项目：
-    - 使用 [Spring Initializr](https://start.spring.io/)：
-        - 选择 Maven/Gradle。
-        - 添加依赖：Spring Web、Spring Data JPA、Spring Security、MySQL Driver。
-
-2. 下载并解压项目。
-
-3. 配置 `application.properties` 文件：
-   ```properties
-   # 数据库配置
-   spring.datasource.url=jdbc:mysql://localhost:3306/my_project_db
-   spring.datasource.username=root
-   spring.datasource.password=yourpassword
-
-   # JPA 配置
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=true
-   ```
-
-4. 启动项目：
-   ```bash
-   ./mvnw spring-boot:run
-   ```
+  初始化 Spring Boot 项目：
+ - 使用 [Spring Initializr](https://start.spring.io/)：
+     - 选择 Maven
+     - 添加依赖：Spring Web、Spring Security、MySQL Driver。
 
 ---
 
-## 7. 容器化技术（可选）
+## 7. 容器化技术
 
 1. 安装 [Docker](https://www.docker.com/)。
-    - 配置镜像加速器（针对国内用户）。
+    
 
-2. 创建 Dockerfile：
-   ```dockerfile
-   FROM openjdk:11-jdk
-   COPY target/my-project.jar app.jar
-   ENTRYPOINT ["java", "-jar", "/app.jar"]
-   ```
+2. IDEA安装Docker插件
+打开 IntelliJ IDEA，点击菜单栏中的 "File" -> "Settings"（或 "IntelliJ IDEA" -> "Preferences"），在左侧栏中选择 "Plugins"，搜索并安装 "Docker" 插件。
+![alt text](https://www.helloimg.com/i/2024/12/23/6768447d57492.png)
 
-3. 构建镜像：
-   ```bash
-   docker build -t my-project:latest .
-   ```
 
-4. 启动容器：
-   ```bash
-   docker run -p 8080:8080 my-project:latest
-   ```
+1. IDEA连接Docker
+   1. Docker for Windows 连接
+"Docker for Windows" 是指在 Windows 操作系统上运行 Docker 容器；
+
+   1. SSH 连接
+"SSH 连接" 用什么用户下载docker，就用什么用户连接SSH;
+
+     1. Connection successful 连接成功
+如下图进行连接测试看看是否能和docker的宿主机连接成功，输入正确的地址后下方会自动显示连接成功的说明。
+![alt text](
+https://www.helloimg.com/i/2024/12/23/6768447d7eaff.png)
+
+
+4. 查看Docker面板
+配置好了docker插件后，会在项目服务（services）下面生成一个Docker面板，可以看到docker中的镜像和容器。
+
+
+
+5. 使用插件生成镜像
+使用插件生成镜像，点击当前文件（currentfile），选择编辑配置，添加新的运行配置找到docker，有docker Image，docker-compose，dockerfile三种选择；
+
+![alt text](https://www.helloimg.com/i/2024/12/23/6768447ce2a10.png
+)
+原文链接：https://blog.csdn.net/m0_67906358/article/details/132261668
 
 ---
 
@@ -166,10 +160,10 @@
             - name: Checkout code
               uses: actions/checkout@v3
  
-            - name: Set up JDK 11
+            - name: Set up JDK 21
               uses: actions/setup-java@v3
               with:
-                java-version: '11'
+                java-version: '21'
  
             - name: Build with Maven
               run: mvn clean install
@@ -184,16 +178,3 @@
 
 2. 配置 GitHub Secrets：
     - 添加 `DOCKER_USERNAME` 和 `DOCKER_PASSWORD`。
-
----
-
-## 9. 编写搭建指南
-
-1. **记录所有步骤：**
-    - 保存为 Markdown 文档，便于共享。
-
-2. **定期更新：**
-    - 根据项目调整，更新配置和依赖信息。
-
-3. **存储位置：**
-    - 提交到项目根目录，命名为 `SETUP.md` 或 `README.md`。
