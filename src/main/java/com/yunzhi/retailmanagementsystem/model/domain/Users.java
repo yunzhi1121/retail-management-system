@@ -6,34 +6,40 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * 
+ *
  * @TableName users
  */
-@TableName(value ="users")
+@TableName(value = "users")
 @Data
 public class Users implements Serializable {
     /**
-     * 
+     *
      */
     @TableId
     private String userID;
 
     /**
-     * 
+     *
      */
     private String username;
 
     /**
-     * 
+     *
      */
     private String password;
 
     /**
-     * 
+     *
      */
     private String role;
+
+    @Getter
+    @Setter
+    private boolean approved;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -46,24 +52,26 @@ public class Users implements Serializable {
         if (that == null) {
             return false;
         }
-        if (getClass() != that.getClass()) {
+        if (getClass()!= that.getClass()) {
             return false;
         }
         Users other = (Users) that;
-        return (this.getUserID() == null ? other.getUserID() == null : this.getUserID().equals(other.getUserID()))
-            && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-            && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-            && (this.getRole() == null ? other.getRole() == null : this.getRole().equals(other.getRole()));
+        return (this.getUserID() == null? other.getUserID() == null : this.getUserID().equals(other.getUserID()))
+                && (this.getUsername() == null? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
+                && (this.getPassword() == null? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
+                && (this.getRole() == null? other.getRole() == null : this.getRole().equals(other.getRole()))
+                && (this.isApproved() == other.isApproved());
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getUserID() == null) ? 0 : getUserID().hashCode());
-        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
-        result = prime * result + ((getPassword() == null) ? 0 : getPassword().hashCode());
-        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
+        result = prime * result + ((getUserID() == null)? 0 : getUserID().hashCode());
+        result = prime * result + ((getUsername() == null)? 0 : getUsername().hashCode());
+        result = prime * result + ((getPassword() == null)? 0 : getPassword().hashCode());
+        result = prime * result + ((getRole() == null)? 0 : getRole().hashCode());
+        result = prime * result + (isApproved()? 1231 : 1237);
         return result;
     }
 
@@ -77,11 +85,9 @@ public class Users implements Serializable {
         sb.append(", username=").append(username);
         sb.append(", password=").append(password);
         sb.append(", role=").append(role);
+        sb.append(", approved=").append(approved);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
-    }
-    public String getId() {
-        return userID;
     }
 }
