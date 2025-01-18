@@ -36,11 +36,10 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-
       # 构建项目
       - name: Build with Maven
         run: mvn clean install 
 
       # 执行测试
       - name: Run tests
-        run: mvn test
+        run: mvn test -e
