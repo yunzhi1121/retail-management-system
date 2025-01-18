@@ -18,7 +18,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost"
+          --health-cmd="mysqladmin ping -h localhost -u root -p123456 || exit 1"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "Waiting for MySQL to be ready..."
           for i in {1..10}; do
-            if mysqladmin ping -h 127.0.0.1 -u test_user -ptest_password --silent; then
+            if mysqladmin ping -h 127.0.0.1 -u root -p123456 --silent; then
               echo "MySQL is ready!"
               break
             fi
@@ -56,7 +56,7 @@ jobs:
       # 验证数据库连接
       - name: Verify database connection
         run: |
-          mysql -h 127.0.0.1 -u root -p 123456 -e "SHOW DATABASES;"
+          mysql -h 127.0.0.1 -u root -p123456 -e "SHOW DATABASES;"
 
       # 缓存 Maven 依赖
       - name: Cache Maven dependencies
