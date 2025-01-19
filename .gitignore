@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# 忽略私钥和公钥文件
+private_key.pem
+public_key.pem
+private_key_base64.txt
+public_key_base64.txt
