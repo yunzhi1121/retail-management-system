@@ -2,14 +2,18 @@ package com.yunzhi.retailmanagementsystem.controller;
 
 import com.yunzhi.retailmanagementsystem.model.domain.Users;
 import com.yunzhi.retailmanagementsystem.service.UsersService;
+import com.yunzhi.retailmanagementsystem.utils.RSAKeyUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,13 +26,19 @@ public class UsersController {
     @Autowired
     private UsersService usersService;
 
+    @Value("${jwt.private-key}")
+    private String privateKeyBase64;
+
+    @Value("${jwt.public-key}")
+    private String publicKeyBase64;
+
     private static final long EXPIRATION_TIME = 3600000; // 1小时，毫秒
-    private static final String SECRET_KEY = "ThisIsASecretKeyForJWTTokenGenerationAndValidation";
+    //private static final String SECRET_KEY = "ThisIsASecretKeyForJWTTokenGenerationAndValidation";
 
     // 用户注册
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody Users user) {
-        if (user.getUsername() == null || user.getPassword() == null || user.getUsername().trim().isEmpty() || user.getPassword().trim().isEmpty()) {
+        if (user.getUsername() == null || user.getPassword() == null) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Invalid request body");
             errorResponse.put("details", "Username and password fields are required.");
@@ -84,18 +94,39 @@ public class UsersController {
     }
 
     private String generateToken(Users user) {
-        Claims claims = Jwts.claims().setSubject(user.getUserID());
-        claims.put("role", user.getRole());
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + EXPIRATION_TIME);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
+        try {
+//            PrivateKey privateKey = RSAKeyUtil.getPrivateKeyFromEnv("JWT_PRIVATE_KEY");
+            PrivateKey privateKey = RSAKeyUtil.getPrivateKeyFromBase64(privateKeyBase64);
+//            PrivateKey privateKey = RSAKeyUtil.getPrivateKey("src/main/resources/private_key.pem");
+            Claims claims = Jwts.claims().setSubject(user.getUserID());
+            claims.put("role", user.getRole());
+            Date now = new Date();
+            Date expiration = new Date(now.getTime() + EXPIRATION_TIME);
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setIssuedAt(now)
+                    .setExpiration(expiration)
+                    .signWith(privateKey, SignatureAlgorithm.RS256)
+                    .compact();
+        } catch (Exception e) {
+            throw new RuntimeException("Error while generating token", e);
+        }
     }
+
+    private Claims parseToken(String token) {
+        try {
+            PublicKey publicKey = RSAKeyUtil.getPublicKey("src/main/resources/public_key.pem");
+
+            return Jwts.parserBuilder()
+                    .setSigningKey(publicKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid or expired token", e);
+        }
+    }
+
 
     // 获取所有未审核用户
     @GetMapping("/unapproved")
