@@ -7,7 +7,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +25,11 @@ public class UsersController {
     @Autowired
     private UsersService usersService;
 
-    @Value("${jwt.private-key}")
+    /*@Value("${jwt.private-key}")
     private String privateKeyBase64;
 
     @Value("${jwt.public-key}")
-    private String publicKeyBase64;
+    private String publicKeyBase64;*/
 
     private static final long EXPIRATION_TIME = 3600000; // 1小时，毫秒
     //private static final String SECRET_KEY = "ThisIsASecretKeyForJWTTokenGenerationAndValidation";
@@ -76,7 +75,6 @@ public class UsersController {
             errorResponse.put("error", "Invalid username or password.");
             return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
         }
-        System.out.println(loggedInUser.toString());
 
         // 检查用户是否已审核
         if (!loggedInUser.isApproved()) {
@@ -95,9 +93,7 @@ public class UsersController {
 
     private String generateToken(Users user) {
         try {
-//            PrivateKey privateKey = RSAKeyUtil.getPrivateKeyFromEnv("JWT_PRIVATE_KEY");
-            PrivateKey privateKey = RSAKeyUtil.getPrivateKeyFromBase64(privateKeyBase64);
-//            PrivateKey privateKey = RSAKeyUtil.getPrivateKey("src/main/resources/private_key.pem");
+            PrivateKey privateKey = RSAKeyUtil.getPrivateKeyFromEnv("PRIVATE_KEY");
             Claims claims = Jwts.claims().setSubject(user.getUserID());
             claims.put("role", user.getRole());
             Date now = new Date();
@@ -115,8 +111,7 @@ public class UsersController {
 
     private Claims parseToken(String token) {
         try {
-            PublicKey publicKey = RSAKeyUtil.getPublicKey("src/main/resources/public_key.pem");
-
+            PublicKey publicKey = RSAKeyUtil.getPublicKeyFromEnv("PUBLIC_KEY");
             return Jwts.parserBuilder()
                     .setSigningKey(publicKey)
                     .build()
@@ -156,7 +151,7 @@ public class UsersController {
             return new ResponseEntity<>(Map.of("error", "User not found for role update."), HttpStatus.NOT_FOUND);
         }
 
-        boolean approvalSuccess = approve? usersService.approveUser(userID) : true;
+        boolean approvalSuccess = !approve || usersService.approveUser(userID);
         if (!approvalSuccess) {
             return new ResponseEntity<>(Map.of("error", "User not found for approval."), HttpStatus.NOT_FOUND);
         }
