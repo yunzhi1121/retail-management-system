@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.GoodsMapper">
+
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.Goods">
+            <id property="goodID" column="GoodID" jdbcType="VARCHAR"/>
+            <result property="name" column="Name" jdbcType="VARCHAR"/>
+            <result property="description" column="Description" jdbcType="VARCHAR"/>
+            <result property="quantity" column="Quantity" jdbcType="INTEGER"/>
+            <result property="price" column="Price" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        GoodID,Name,Description,
+        Quantity,Price
+    </sql>
+    <!-- 根据商品名称模糊查询商品列表 -->
+    <select id="selectByNameLike" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM goods
+        WHERE Name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+    <!-- 根据商品ID查询商品 -->
+    <select id="selectByGoodId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM goods
+        WHERE GoodID = #{goodId}
+    </select>
+
+    <!-- 根据商品库存数量范围查询商品列表 -->
+    <select id="selectByQuantityRange" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM goods
+        WHERE Quantity BETWEEN #{minQuantity} AND #{maxQuantity}
+    </select>
+
+</mapper>

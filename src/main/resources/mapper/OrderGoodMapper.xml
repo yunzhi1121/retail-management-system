@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.OrderGoodMapper">
+
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.OrderGood">
+            <id property="orderID" column="OrderID" jdbcType="VARCHAR"/>
+            <id property="goodID" column="GoodID" jdbcType="VARCHAR"/>
+            <result property="quantity" column="Quantity" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        OrderID,GoodID,Quantity
+    </sql>
+    <!-- 根据订单ID查询订单商品列表 -->
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM order_good
+        WHERE OrderID = #{orderId}
+    </select>
+
+    <!-- 根据商品ID查询包含该商品的订单商品列表 -->
+    <select id="selectByGoodId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM order_good
+        WHERE GoodID = #{goodId}
+    </select>
+</mapper>

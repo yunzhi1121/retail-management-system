@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.TrackingMapper">
+
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.Tracking">
+            <id property="trackingID" column="TrackingID" jdbcType="VARCHAR"/>
+            <result property="orderID" column="OrderID" jdbcType="VARCHAR"/>
+            <result property="location" column="Location" jdbcType="VARCHAR"/>
+            <result property="timestamp" column="Timestamp" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        TrackingID,OrderID,Location,
+        Timestamp
+    </sql>
+
+    <!-- 根据订单ID查询物流追踪信息 -->
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM tracking
+        WHERE OrderID = #{orderId}
+    </select>
+
+    <!-- 根据物流追踪ID查询物流追踪信息 -->
+    <select id="selectByTrackingId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM tracking
+        WHERE TrackingID = #{trackingId}
+    </select>
+
+</mapper>

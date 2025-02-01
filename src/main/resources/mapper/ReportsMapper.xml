@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.ReportsMapper">
+
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.Reports">
+            <id property="reportID" column="ReportID" jdbcType="VARCHAR"/>
+            <result property="userID" column="UserID" jdbcType="VARCHAR"/>
+            <result property="parameters" column="Parameters" jdbcType="VARCHAR"/>
+            <result property="generatedDate" column="GeneratedDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ReportID,UserID,Parameters,
+        GeneratedDate
+    </sql>
+
+    <!-- 根据用户ID查询报表列表 -->
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM reports
+        WHERE UserID = #{userId}
+    </select>
+
+    <!-- 根据报表生成日期范围查询报表列表 -->
+    <select id="selectByGeneratedDateRange" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM reports
+        WHERE GeneratedDate BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- 根据报表ID查询报表 -->
+    <select id="selectByReportId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM reports
+        WHERE ReportID = #{reportId}
+    </select>
+
+</mapper>

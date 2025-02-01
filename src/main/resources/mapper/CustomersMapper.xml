@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.CustomersMapper">
+
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.Customers">
+            <id property="customerID" column="CustomerID" jdbcType="VARCHAR"/>
+            <result property="name" column="Name" jdbcType="VARCHAR"/>
+            <result property="email" column="Email" jdbcType="VARCHAR"/>
+            <result property="phone" column="Phone" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        CustomerID,Name,Email,
+        Phone
+    </sql>
+    <update id="updateCustomerInfo">
+
+    </update>
+
+    <!-- 根据客户姓名模糊查询客户列表 -->
+    <select id="selectByNameLike" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM customers
+        WHERE Name LIKE CONCAT('%', #{name}, '%')
+    </select>
+
+    <!-- 根据客户ID查询客户 -->
+    <select id="selectByCustomerId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM customers
+        WHERE CustomerID = #{customerId}
+    </select>
+
+    <!-- 根据客户邮箱查询客户 -->
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM customers
+        WHERE Email = #{email}
+    </select>
+
+</mapper>
