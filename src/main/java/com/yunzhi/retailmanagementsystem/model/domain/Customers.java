@@ -14,28 +14,32 @@ import lombok.Data;
 @Data
 public class Customers implements Serializable {
     /**
-     * 
+     * 客户ID，唯一标识一个客户
      */
     @TableId
     private String customerID;
 
     /**
-     * 
+     * 客户名称
      */
     private String name;
 
     /**
-     * 
+     * 客户邮箱地址
      */
     private String email;
 
     /**
-     * 
+     * 客户联系电话
      */
     private String phone;
 
+    /**
+     * 序列化版本ID，用于序列化过程中的版本控制
+     */
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
     // 省略getter/setter方法
     @Override
     public boolean equals(Object that) {
