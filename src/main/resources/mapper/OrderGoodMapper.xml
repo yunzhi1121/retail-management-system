@@ -4,15 +4,23 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.OrderGoodMapper">
 
-    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.OrderGood">
-            <id property="orderID" column="OrderID" jdbcType="VARCHAR"/>
-            <id property="goodID" column="GoodID" jdbcType="VARCHAR"/>
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.po.OrderGood">
+            <id property="orderId" column="OrderID" jdbcType="VARCHAR"/>
+            <id property="goodId" column="GoodID" jdbcType="VARCHAR"/>
             <result property="quantity" column="Quantity" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         OrderID,GoodID,Quantity
     </sql>
+    <insert id="insertBatch">
+        INSERT INTO order_good
+        (orderId, goodId, quantity)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.orderId}, #{item.goodId}, #{item.quantity})
+        </foreach>
+    </insert>
     <!-- 根据订单ID查询订单商品列表 -->
     <select id="selectByOrderId" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>

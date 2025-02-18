@@ -1,10 +1,11 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 
@@ -12,12 +13,13 @@ import lombok.Data;
  */
 @TableName(value ="customers")
 @Data
+@Accessors(chain = true)
 public class Customers implements Serializable {
     /**
      * 客户ID，唯一标识一个客户
      */
     @TableId
-    private String customerID;
+    private String CustomerId;
 
     /**
      * 客户名称
@@ -53,7 +55,7 @@ public class Customers implements Serializable {
             return false;
         }
         Customers other = (Customers) that;
-        return (this.getCustomerID() == null ? other.getCustomerID() == null : this.getCustomerID().equals(other.getCustomerID()))
+        return (this.getCustomerId() == null ? other.getCustomerId() == null : this.getCustomerId().equals(other.getCustomerId()))
             && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
             && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
             && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()));
@@ -63,7 +65,7 @@ public class Customers implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getCustomerID() == null) ? 0 : getCustomerID().hashCode());
+        result = prime * result + ((getCustomerId() == null) ? 0 : getCustomerId().hashCode());
         result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
         result = prime * result + ((getEmail() == null) ? 0 : getEmail().hashCode());
         result = prime * result + ((getPhone() == null) ? 0 : getPhone().hashCode());
@@ -76,7 +78,7 @@ public class Customers implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", customerID=").append(customerID);
+        sb.append(", customerID=").append(CustomerId);
         sb.append(", name=").append(name);
         sb.append(", email=").append(email);
         sb.append(", phone=").append(phone);

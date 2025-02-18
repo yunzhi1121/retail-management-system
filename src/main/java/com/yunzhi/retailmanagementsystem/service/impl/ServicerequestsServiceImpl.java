@@ -1,7 +1,7 @@
 package com.yunzhi.retailmanagementsystem.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yunzhi.retailmanagementsystem.model.domain.Servicerequests;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Servicerequests;
 import com.yunzhi.retailmanagementsystem.service.ServicerequestsService;
 import com.yunzhi.retailmanagementsystem.Mapper.ServicerequestsMapper;
 import org.springframework.stereotype.Service;

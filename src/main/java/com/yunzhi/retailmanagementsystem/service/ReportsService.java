@@ -1,6 +1,6 @@
 package com.yunzhi.retailmanagementsystem.service;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Reports;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Reports;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

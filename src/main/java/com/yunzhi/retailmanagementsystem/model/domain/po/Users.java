@@ -1,6 +1,5 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +19,7 @@ public class Users implements Serializable {
      *
      */
     @TableId
-    private String userID;
+    private String userId;
 
     /**
      *
@@ -56,7 +55,7 @@ public class Users implements Serializable {
             return false;
         }
         Users other = (Users) that;
-        return (this.getUserID() == null? other.getUserID() == null : this.getUserID().equals(other.getUserID()))
+        return (this.getUserId() == null? other.getUserId() == null : this.getUserId().equals(other.getUserId()))
                 && (this.getUsername() == null? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
                 && (this.getPassword() == null? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
                 && (this.getRole() == null? other.getRole() == null : this.getRole().equals(other.getRole()))
@@ -67,7 +66,7 @@ public class Users implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getUserID() == null)? 0 : getUserID().hashCode());
+        result = prime * result + ((getUserId() == null)? 0 : getUserId().hashCode());
         result = prime * result + ((getUsername() == null)? 0 : getUsername().hashCode());
         result = prime * result + ((getPassword() == null)? 0 : getPassword().hashCode());
         result = prime * result + ((getRole() == null)? 0 : getRole().hashCode());
@@ -81,7 +80,7 @@ public class Users implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", userID=").append(userID);
+        sb.append(", userID=").append(userId);
         sb.append(", username=").append(username);
         sb.append(", password=").append(password);
         sb.append(", role=").append(role);

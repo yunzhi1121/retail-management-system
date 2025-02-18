@@ -1,8 +1,7 @@
 package com.yunzhi.retailmanagementsystem.service;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Users;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Users;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +22,7 @@ class UsersServiceTest {
     public void setUp() {
         // 创建一个测试用户对象
         testUser = new Users();
-        testUser.setUserID("123");
+        testUser.setUserId("123");
         testUser.setUsername("testUser");
         testUser.setPassword("password");
         testUser.setRole("user");
@@ -37,7 +36,7 @@ class UsersServiceTest {
         Users user = usersService.getByUserId("123");
 
         assertNotNull(user);
-        assertEquals("123", user.getUserID());
+        assertEquals("123", user.getUserId());
         assertEquals("testUser", user.getUsername());
         assertEquals("password", user.getPassword());
         assertEquals("user", user.getRole());
@@ -49,7 +48,7 @@ class UsersServiceTest {
         Users user = usersService.getByUsername("testUser");
 
         assertNotNull(user);
-        assertEquals("123", user.getUserID());
+        assertEquals("123", user.getUserId());
         assertEquals("testUser", user.getUsername());
         assertEquals("password", user.getPassword());
         assertEquals("user", user.getRole());

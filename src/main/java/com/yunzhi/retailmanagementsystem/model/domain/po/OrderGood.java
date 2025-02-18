@@ -1,10 +1,11 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 
@@ -12,18 +13,19 @@ import lombok.Data;
  */
 @TableName(value ="order_good")
 @Data
+@Accessors(chain = true)
 public class OrderGood implements Serializable {
     /**
      * 
      */
     @TableId
-    private String orderID;
+    private String orderId;
 
     /**
      * 
      */
 //    @TableId
-    private String goodID;
+    private String goodId;
 
     /**
      * 
@@ -45,8 +47,8 @@ public class OrderGood implements Serializable {
             return false;
         }
         OrderGood other = (OrderGood) that;
-        return (this.getOrderID() == null ? other.getOrderID() == null : this.getOrderID().equals(other.getOrderID()))
-            && (this.getGoodID() == null ? other.getGoodID() == null : this.getGoodID().equals(other.getGoodID()))
+        return (this.getOrderId() == null ? other.getOrderId() == null : this.getOrderId().equals(other.getOrderId()))
+            && (this.getGoodId() == null ? other.getGoodId() == null : this.getGoodId().equals(other.getGoodId()))
             && (this.getQuantity() == null ? other.getQuantity() == null : this.getQuantity().equals(other.getQuantity()));
     }
 
@@ -54,8 +56,8 @@ public class OrderGood implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getOrderID() == null) ? 0 : getOrderID().hashCode());
-        result = prime * result + ((getGoodID() == null) ? 0 : getGoodID().hashCode());
+        result = prime * result + ((getOrderId() == null) ? 0 : getOrderId().hashCode());
+        result = prime * result + ((getGoodId() == null) ? 0 : getGoodId().hashCode());
         result = prime * result + ((getQuantity() == null) ? 0 : getQuantity().hashCode());
         return result;
     }
@@ -66,8 +68,8 @@ public class OrderGood implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", orderID=").append(orderID);
-        sb.append(", goodID=").append(goodID);
+        sb.append(", orderID=").append(orderId);
+        sb.append(", goodID=").append(goodId);
         sb.append(", quantity=").append(quantity);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");

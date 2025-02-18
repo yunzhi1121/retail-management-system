@@ -1,4 +1,4 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -17,12 +17,12 @@ public class Servicerequests implements Serializable {
      * 
      */
     @TableId
-    private String requestID;
+    private String requestId;
 
     /**
      * 
      */
-    private String customerID;
+    private String customerId;
 
     /**
      * 
@@ -49,8 +49,8 @@ public class Servicerequests implements Serializable {
             return false;
         }
         Servicerequests other = (Servicerequests) that;
-        return (this.getRequestID() == null ? other.getRequestID() == null : this.getRequestID().equals(other.getRequestID()))
-            && (this.getCustomerID() == null ? other.getCustomerID() == null : this.getCustomerID().equals(other.getCustomerID()))
+        return (this.getRequestId() == null ? other.getRequestId() == null : this.getRequestId().equals(other.getRequestId()))
+            && (this.getCustomerId() == null ? other.getCustomerId() == null : this.getCustomerId().equals(other.getCustomerId()))
             && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()));
     }
@@ -59,8 +59,8 @@ public class Servicerequests implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getRequestID() == null) ? 0 : getRequestID().hashCode());
-        result = prime * result + ((getCustomerID() == null) ? 0 : getCustomerID().hashCode());
+        result = prime * result + ((getRequestId() == null) ? 0 : getRequestId().hashCode());
+        result = prime * result + ((getCustomerId() == null) ? 0 : getCustomerId().hashCode());
         result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         return result;
@@ -72,8 +72,8 @@ public class Servicerequests implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", requestID=").append(requestID);
-        sb.append(", customerID=").append(customerID);
+        sb.append(", requestID=").append(requestId);
+        sb.append(", customerID=").append(customerId);
         sb.append(", description=").append(description);
         sb.append(", status=").append(status);
         sb.append(", serialVersionUID=").append(serialVersionUID);

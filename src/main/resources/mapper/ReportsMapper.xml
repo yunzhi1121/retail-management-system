@@ -4,9 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.ReportsMapper">
 
-    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.Reports">
-            <id property="reportID" column="ReportID" jdbcType="VARCHAR"/>
-            <result property="userID" column="UserID" jdbcType="VARCHAR"/>
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.po.Reports">
+            <id property="reportId" column="ReportID" jdbcType="VARCHAR"/>
+            <result property="userId" column="UserID" jdbcType="VARCHAR"/>
             <result property="parameters" column="Parameters" jdbcType="VARCHAR"/>
             <result property="generatedDate" column="GeneratedDate" jdbcType="TIMESTAMP"/>
     </resultMap>

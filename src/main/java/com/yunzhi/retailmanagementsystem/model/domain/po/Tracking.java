@@ -1,4 +1,4 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -18,12 +18,12 @@ public class Tracking implements Serializable {
      * 
      */
     @TableId
-    private String trackingID;
+    private String trackingId;
 
     /**
      * 
      */
-    private String orderID;
+    private String orderId;
 
     /**
      * 
@@ -50,8 +50,8 @@ public class Tracking implements Serializable {
             return false;
         }
         Tracking other = (Tracking) that;
-        return (this.getTrackingID() == null ? other.getTrackingID() == null : this.getTrackingID().equals(other.getTrackingID()))
-            && (this.getOrderID() == null ? other.getOrderID() == null : this.getOrderID().equals(other.getOrderID()))
+        return (this.getTrackingId() == null ? other.getTrackingId() == null : this.getTrackingId().equals(other.getTrackingId()))
+            && (this.getOrderId() == null ? other.getOrderId() == null : this.getOrderId().equals(other.getOrderId()))
             && (this.getLocation() == null ? other.getLocation() == null : this.getLocation().equals(other.getLocation()))
             && (this.getTimestamp() == null ? other.getTimestamp() == null : this.getTimestamp().equals(other.getTimestamp()));
     }
@@ -60,8 +60,8 @@ public class Tracking implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getTrackingID() == null) ? 0 : getTrackingID().hashCode());
-        result = prime * result + ((getOrderID() == null) ? 0 : getOrderID().hashCode());
+        result = prime * result + ((getTrackingId() == null) ? 0 : getTrackingId().hashCode());
+        result = prime * result + ((getOrderId() == null) ? 0 : getOrderId().hashCode());
         result = prime * result + ((getLocation() == null) ? 0 : getLocation().hashCode());
         result = prime * result + ((getTimestamp() == null) ? 0 : getTimestamp().hashCode());
         return result;
@@ -73,8 +73,8 @@ public class Tracking implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", trackingID=").append(trackingID);
-        sb.append(", orderID=").append(orderID);
+        sb.append(", trackingID=").append(trackingId);
+        sb.append(", orderID=").append(orderId);
         sb.append(", location=").append(location);
         sb.append(", timestamp=").append(timestamp);
         sb.append(", serialVersionUID=").append(serialVersionUID);

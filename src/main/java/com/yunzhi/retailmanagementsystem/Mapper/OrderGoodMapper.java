@@ -1,8 +1,8 @@
 package com.yunzhi.retailmanagementsystem.Mapper;
 
-import com.yunzhi.retailmanagementsystem.model.domain.OrderGood;
+import com.yunzhi.retailmanagementsystem.model.domain.po.OrderGood;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 /**
@@ -12,11 +12,14 @@ import java.util.List;
 * @Entity generator.domain.OrderGood
 */
 public interface OrderGoodMapper extends BaseMapper<OrderGood> {
-    // 根据订单ID查询订单商品列表
-    List<OrderGood> selectByOrderId(String orderId);
+    /**
+     * 批量插入订单商品关联记录
+     * @param list 订单商品列表
+     * @return 插入记录数
+     */
+    int insertBatch(@Param("list") List<OrderGood> list);
 
-    // 根据商品ID查询包含该商品的订单商品列表
-    List<OrderGood> selectByGoodId(String goodId);
+    List<OrderGood> selectByOrderId(String orderId);
 }
 
 

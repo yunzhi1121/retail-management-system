@@ -1,31 +1,37 @@
 package com.yunzhi.retailmanagementsystem.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yunzhi.retailmanagementsystem.Mapper.CustomersMapper;
 import com.yunzhi.retailmanagementsystem.Mapper.GoodsMapper;
 import com.yunzhi.retailmanagementsystem.Mapper.OrderGoodMapper;
 import com.yunzhi.retailmanagementsystem.Mapper.OrdersMapper;
-import com.yunzhi.retailmanagementsystem.model.domain.Customers;
-import com.yunzhi.retailmanagementsystem.model.domain.Goods;
-import com.yunzhi.retailmanagementsystem.model.domain.OrderGood;
-import com.yunzhi.retailmanagementsystem.model.domain.Orders;
+import com.yunzhi.retailmanagementsystem.exception.BusinessException;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Customers;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Goods;
+import com.yunzhi.retailmanagementsystem.model.domain.po.OrderGood;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Orders;
+import com.yunzhi.retailmanagementsystem.model.domain.enums.OrderStatus;
+import com.yunzhi.retailmanagementsystem.response.ErrorCode;
 import com.yunzhi.retailmanagementsystem.service.OrdersService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Chloe
  * @description 针对表【orders】的数据库操作Service实现
  * @createDate 2025-01-12 17:32:21
  */
-
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> implements OrdersService {
 
     @Autowired
@@ -38,180 +44,225 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     private CustomersMapper customersMapper;
 
     @Override
-    @Transactional
-    public Orders createOrder(String customerID, Map<String, Integer> goodQuantities, String paymentMethod, String deliveryMethod, String remarks) {
-        // 0. 验证用户 ID 是否存在
-        Customers customer = customersMapper.selectOne(Wrappers.<Customers>lambdaQuery().eq(Customers::getCustomerID, customerID));
+    @Transactional(rollbackFor = Exception.class)
+    public Orders createOrder(String customerId, Map<String, Integer> itemQuantities,
+                              String paymentMethod, String deliveryMethod, String remarks) {
+        // 1. 校验客户存在性
+        Customers customer = customersMapper.selectById(customerId);
         if (customer == null) {
-            throw new RuntimeException("用户 ID 不存在");
+            throw new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND);
         }
-        List<Goods> goods = new ArrayList<>();
-        // 1. 检查商品库存是否足够
-        for (Map.Entry<String, Integer> entry : goodQuantities.entrySet()) {
-            String goodId = entry.getKey();
-            Integer quantity = entry.getValue();
-            Goods dbGood = goodsMapper.selectById(goodId);
-            if (dbGood == null) {
-                throw new RuntimeException("商品 ID 不存在");
-            }
-            if (dbGood.getQuantity() < quantity) {
-                throw new RuntimeException("商品库存不足");
-            }
-            Goods good = new Goods();
-            good.setGoodID(goodId);
-            good.setQuantity(quantity);
-            good.setPrice(dbGood.getPrice());
-            goods.add(good);
-        }
-        // 2. 计算订单金额
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (Goods good : goods) {
-            totalAmount = totalAmount.add(good.getPrice().multiply(BigDecimal.valueOf(good.getQuantity())));
-        }
-        // 3. 保存订单，并生成订单 ID
-        String orderID = UUID.randomUUID().toString();
-        Orders order = new Orders();
-        order.setOrderID(orderID);
-        order.setCustomerID(customerID);
-        order.setOrderDate(new Date());
-        order.setStatus("待发货");
-        order.setTotalAmount(totalAmount);
-        order.setPaymentMethod(paymentMethod);
-        order.setDeliveryMethod(deliveryMethod);
-        order.setRemarks(remarks);
+
+        // 2. 校验商品库存
+        List<String> goodIds = new ArrayList<>(itemQuantities.keySet());
+        List<Goods> goodsList = goodsMapper.selectBatchIds(goodIds);
+        validateGoods(goodsList, itemQuantities, goodIds);
+
+        // 3. 创建订单记录
+        Orders order = buildOrder(customerId, paymentMethod, deliveryMethod, remarks, goodsList, itemQuantities);
         ordersMapper.insert(order);
-        // 4. 插入订单商品关联记录
-        for (Goods good : goods) {
-            OrderGood orderGood = new OrderGood();
-            orderGood.setOrderID(orderID);
-            orderGood.setGoodID(good.getGoodID());
-            orderGood.setQuantity(good.getQuantity());
-            orderGoodMapper.insert(orderGood);
-            // 5. 更新商品库存
-            Goods dbGood = goodsMapper.selectById(good.getGoodID());
-            dbGood.setQuantity(dbGood.getQuantity() - good.getQuantity());
-            goodsMapper.updateById(dbGood);
+
+        // 4. 保存订单商品关联
+        saveOrderGoods(order.getOrderId(), goodsList, itemQuantities);
+
+        // 5. 扣减库存
+        updateGoodsStock(goodsList, itemQuantities, false);
+
+        return order;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrder(String orderId, Map<String, Integer> newItemQuantities,
+                            String newPaymentMethod, String newDeliveryMethod, String newRemarks) {
+        // 1. 验证订单状态
+        Orders order = getValidOrder(orderId);
+        if (!OrderStatus.PENDING.getCode().equals(order.getStatus())) {
+            throw new BusinessException(ErrorCode.ORDER_STATUS_ERROR, "只允许修改待发货订单");
+        }
+
+        // 2. 释放原库存
+        List<OrderGood> oldOrderGoods = orderGoodMapper.selectByOrderId(orderId);
+        revertOldStock(oldOrderGoods);
+
+        // 3. 删除原商品关联
+        orderGoodMapper.deleteById(orderId);
+
+        // 4. 校验新商品库存
+        List<String> newGoodIds = new ArrayList<>(newItemQuantities.keySet());
+        List<Goods> newGoodsList = goodsMapper.selectBatchIds(newGoodIds);
+        validateGoods(newGoodsList, newItemQuantities, newGoodIds);
+
+        // 5. 更新订单信息
+        updateOrderInfo(order, newPaymentMethod, newDeliveryMethod, newRemarks, newGoodsList, newItemQuantities);
+
+        // 6. 保存新商品关联
+        saveOrderGoods(orderId, newGoodsList, newItemQuantities);
+
+        // 7. 扣减新库存
+        updateGoodsStock(newGoodsList, newItemQuantities, false);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrder(String orderId) {
+        // 1. 验证订单状态
+        Orders order = getValidOrder(orderId);
+        if (!OrderStatus.PENDING.getCode().equals(order.getStatus())) {
+            throw new BusinessException(ErrorCode.ORDER_STATUS_ERROR, "只允许取消待发货订单");
+        }
+
+        // 2. 释放库存
+        List<OrderGood> orderGoods = orderGoodMapper.selectByOrderId(orderId);
+        revertOldStock(orderGoods);
+
+        // 3. 更新订单状态
+        order.setStatus(OrderStatus.CANCELLED.getCode());
+        ordersMapper.updateById(order);
+    }
+
+    @Override
+    public Orders getOrderDetail(String orderId) {
+        Orders order = ordersMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
         }
         return order;
     }
+
     @Override
-    @Transactional
-    public boolean updateOrder(String orderID, Map<String, Integer> newGoodQuantities, String newPaymentMethod, String newDeliveryMethod, String newRemarks) {
-        // 1. 查询订单状态，确保订单未发货
-        Orders order = ordersMapper.selectById(orderID);
-        if (!"待发货".equals(order.getStatus())) {
-            throw new RuntimeException("订单已发货，无法修改订单");
+    public List<Orders> getCustomerOrders(String customerId) {
+        Customers customer = customersMapper.selectById(customerId);
+        if (customer == null) {
+            throw new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND);
         }
-        // 2. 释放原订单商品库存
-        QueryWrapper<OrderGood> wrapper = new QueryWrapper<>();
-        wrapper.eq("orderID", orderID);
-        List<OrderGood> oldOrderGoods = orderGoodMapper.selectList(wrapper);
-        for (OrderGood oldOrderGood : oldOrderGoods) {
-            Goods good = goodsMapper.selectById(oldOrderGood.getGoodID());
-            good.setQuantity(good.getQuantity() + oldOrderGood.getQuantity());
-            goodsMapper.updateById(good);
+        return ordersMapper.selectList(new LambdaQueryWrapper<Orders>()
+                .eq(Orders::getCustomerId, customerId)
+                .orderByDesc(Orders::getOrderDate));
+    }
+    @Override
+    public List<OrderGood> getOrderGoodsByOrderId(String orderId) {
+        if (orderId == null || orderId.isEmpty()) {
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
         }
-        // 删除原订单商品关联记录
-        orderGoodMapper.delete(wrapper);
-        List<Goods> newGoods = new ArrayList<>();
-        // 3. 检查新商品库存是否足够
-        for (Map.Entry<String, Integer> entry : newGoodQuantities.entrySet()) {
-            String goodId = entry.getKey();
-            Integer quantity = entry.getValue();
-            Goods dbGood = goodsMapper.selectById(goodId);
-            if (dbGood == null) {
-                throw new RuntimeException("商品 ID 不存在");
+        return Optional.ofNullable(orderGoodMapper.selectList(
+                new LambdaQueryWrapper<OrderGood>()
+                        .eq(OrderGood::getOrderId, orderId) // 使用实体类字段引用
+        )).orElse(Collections.emptyList()); // 避免返回 null
+    }
+
+    @Override
+    public List<Goods> batchGetGoodsByIds(Collection<String> goodIds) {
+        if (goodIds == null || goodIds.isEmpty()) {
+            throw new IllegalArgumentException("商品ID集合不能为空");
+        }
+
+        // 限制最大查询数量防止内存溢出
+        int maxBatchSize = 1000;
+        if (goodIds.size() > maxBatchSize) {
+            throw new BusinessException(ErrorCode.QUERY_LIMIT_EXCEEDED);
+        }
+
+        return goodsMapper.selectBatchIds(goodIds);
+    }
+
+    // 辅助方法---------------------------------------------------------------
+
+    private Orders getValidOrder(String orderId) {
+        Orders order = ordersMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        return order;
+    }
+
+    private void validateGoods(List<Goods> goodsList, Map<String, Integer> itemQuantities, List<String> goodIds) {
+        // 校验商品是否存在
+        if (goodsList.size() != goodIds.size()) {
+            Set<String> existIds = goodsList.stream()
+                    .map(Goods::getGoodId)
+                    .collect(Collectors.toSet());
+            String missingIds = goodIds.stream()
+                    .filter(id -> !existIds.contains(id))
+                    .collect(Collectors.joining(","));
+            throw new BusinessException(ErrorCode.GOODS_NOT_FOUND, "缺失商品ID: " + missingIds);
+        }
+
+        // 校验库存
+        goodsList.forEach(good -> {
+            int required = itemQuantities.get(good.getGoodId());
+            if (good.getQuantity() < required) {
+                throw new BusinessException(ErrorCode.INSUFFICIENT_STOCK,
+                        String.format("商品[%s]库存不足，剩余%d件", good.getName(), good.getQuantity()));
             }
-            if (dbGood.getQuantity() < quantity) {
-                throw new RuntimeException("商品库存不足");
+        });
+    }
+
+    private Orders buildOrder(String customerId, String paymentMethod, String deliveryMethod,
+                              String remarks, List<Goods> goodsList, Map<String, Integer> itemQuantities) {
+        return new Orders()
+                .setOrderId(UUID.randomUUID().toString())
+                .setCustomerId(customerId)
+                .setTotalAmount(calculateTotalAmount(goodsList, itemQuantities))
+                .setPaymentMethod(paymentMethod)
+                .setDeliveryMethod(deliveryMethod)
+                .setRemarks(remarks)
+                .setStatus(OrderStatus.PENDING.getCode())
+                .setOrderDate(new Date());
+    }
+
+    private BigDecimal calculateTotalAmount(List<Goods> goodsList, Map<String, Integer> itemQuantities) {
+        return goodsList.stream()
+                .map(good -> good.getPrice()
+                        .multiply(BigDecimal.valueOf(itemQuantities.get(good.getGoodId()))))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private void saveOrderGoods(String orderId, List<Goods> goodsList, Map<String, Integer> itemQuantities) {
+        List<OrderGood> orderGoods = goodsList.stream()
+                .map(good -> new OrderGood()
+                        .setOrderId(orderId)
+                        .setGoodId(good.getGoodId())
+                        .setQuantity(itemQuantities.get(good.getGoodId())))
+                .collect(Collectors.toList());
+        orderGoodMapper.insertBatch(orderGoods);
+    }
+
+    private void updateGoodsStock(List<Goods> goodsList, Map<String, Integer> itemQuantities, boolean isRevert) {
+        goodsList.forEach(good -> {
+            int quantityChange = itemQuantities.get(good.getGoodId());
+            int newQuantity = isRevert ?
+                    good.getQuantity() + quantityChange :
+                    good.getQuantity() - quantityChange;
+
+            good.setQuantity(newQuantity);
+            if (goodsMapper.updateById(good) == 0) {
+                throw new BusinessException(ErrorCode.CONCURRENT_UPDATE_ERROR, "商品库存更新冲突");
             }
-            Goods good = new Goods();
-            good.setGoodID(goodId);
-            good.setQuantity(quantity);
-            good.setPrice(dbGood.getPrice());
-            newGoods.add(good);
-        }
-        // 4. 计算新订单金额
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (Goods good : newGoods) {
-            totalAmount = totalAmount.add(good.getPrice().multiply(BigDecimal.valueOf(good.getQuantity())));
-        }
-        // 5. 更新订单信息
-        order.setTotalAmount(totalAmount);
-        order.setPaymentMethod(newPaymentMethod);
-        order.setDeliveryMethod(newDeliveryMethod);
-        order.setRemarks(newRemarks);
-        ordersMapper.updateById(order);
-        // 6. 插入新的订单商品关联记录
-        for (Goods good : newGoods) {
-            OrderGood orderGood = new OrderGood();
-            orderGood.setOrderID(orderID);
-            orderGood.setGoodID(good.getGoodID());
-            orderGood.setQuantity(good.getQuantity());
-            orderGoodMapper.insert(orderGood);
-            // 7. 更新商品库存
-            Goods dbGood = goodsMapper.selectById(good.getGoodID());
-            dbGood.setQuantity(dbGood.getQuantity() - good.getQuantity());
-            goodsMapper.updateById(dbGood);
-        }
-        return true;
+        });
     }
 
-    @Override
-    @Transactional
-    public boolean cancelOrder(String orderID) {
-        // 1. 查询订单状态，确保订单未发货
-        Orders order = ordersMapper.selectById(orderID);
-        if (!"待发货".equals(order.getStatus())) {
-            throw new RuntimeException("订单已发货，无法取消订单");
-        }
+    private void revertOldStock(List<OrderGood> oldOrderGoods) {
+        List<String> oldGoodIds = oldOrderGoods.stream()
+                .map(OrderGood::getGoodId)
+                .collect(Collectors.toList());
 
-        // 2. 释放订单商品库存
-        QueryWrapper<OrderGood> wrapper = new QueryWrapper<>();
-        wrapper.eq("orderID", orderID);
-        List<OrderGood> orderGoods = orderGoodMapper.selectList(wrapper);
-        for (OrderGood orderGood : orderGoods) {
-            Goods good = goodsMapper.selectById(orderGood.getGoodID());
-            good.setQuantity(good.getQuantity() + orderGood.getQuantity());
-            goodsMapper.updateById(good);
-        }
+        List<Goods> oldGoods = goodsMapper.selectBatchIds(oldGoodIds);
+        Map<String, Integer> revertQuantities = oldOrderGoods.stream()
+                .collect(Collectors.toMap(OrderGood::getGoodId, OrderGood::getQuantity));
 
-        // 3. 更新订单状态为已取消
-        order.setStatus("已取消");
-        ordersMapper.updateById(order);
-
-        return true;
+        updateGoodsStock(oldGoods, revertQuantities, true);
     }
 
-    @Override
-    public String getOrderStatus(String orderID) {
-        Orders order = ordersMapper.selectById(orderID);
-        if (order != null) {
-            return order.getStatus();
+    private void updateOrderInfo(Orders order, String paymentMethod, String deliveryMethod,
+                                 String remarks, List<Goods> newGoods, Map<String, Integer> newQuantities) {
+        order.setPaymentMethod(paymentMethod)
+                .setDeliveryMethod(deliveryMethod)
+                .setRemarks(remarks)
+                .setTotalAmount(calculateTotalAmount(newGoods, newQuantities));
+
+        if (ordersMapper.updateById(order) == 0) {
+            throw new BusinessException(ErrorCode.CONCURRENT_UPDATE_ERROR, "订单更新冲突");
         }
-        return null;
-    }
-
-    @Override
-    public List<Orders> getOrdersByCustomer(String customerID) {
-        Customers cutomer = customersMapper.selectById(customerID);
-        if (cutomer == null) {
-            throw new RuntimeException("客户不存在");
-        }
-        QueryWrapper<Orders> wrapper = new QueryWrapper<>();
-        wrapper.eq("customerID", customerID);
-        return ordersMapper.selectList(wrapper);
-    }
-
-    @Override
-    public Orders getOrderById(String orderID) {
-        return ordersMapper.selectById(orderID);
-    }
-
-    @Override
-    public List<OrderGood> getOrderGoodsByOrderId(String orderID) {
-        QueryWrapper<OrderGood> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("orderID", orderID);
-        return orderGoodMapper.selectList(queryWrapper);
     }
 }

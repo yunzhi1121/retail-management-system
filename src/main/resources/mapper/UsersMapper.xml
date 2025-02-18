@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.UsersMapper">
 
-    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.Users">
-        <id property="userID" column="UserID" jdbcType="VARCHAR"/>
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.po.Users">
+        <id property="userId" column="UserID" jdbcType="VARCHAR"/>
         <result property="username" column="Username" jdbcType="VARCHAR"/>
         <result property="password" column="Password" jdbcType="VARCHAR"/>
         <result property="role" column="Role" jdbcType="VARCHAR"/>

@@ -1,9 +1,12 @@
 package com.yunzhi.retailmanagementsystem.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yunzhi.retailmanagementsystem.model.domain.Customers;
+import com.yunzhi.retailmanagementsystem.Mapper.CustomersMapper;
+import com.yunzhi.retailmanagementsystem.exception.BusinessException;
+import com.yunzhi.retailmanagementsystem.response.ErrorCode;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Customers;
 import com.yunzhi.retailmanagementsystem.service.CustomersService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -15,139 +18,96 @@ import java.util.regex.Pattern;
  * @createDate 2025-01-12 17:32:33
  */
 @Service
-public class CustomersServiceImpl extends ServiceImpl<com.yunzhi.retailmanagementsystem.Mapper.CustomersMapper, Customers> implements CustomersService {
-
-    // 邮箱格式正则表达式
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
-    // 电话号码格式正则表达式（假设为11位数字）
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{11}$");
+@Slf4j
+public class CustomersServiceImpl extends ServiceImpl<CustomersMapper, Customers> implements CustomersService {
+    private static final Pattern EMAIL_REGEX = Pattern.compile("^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$");
+    private static final Pattern PHONE_REGEX = Pattern.compile("^1[3-9]\\d{9}$");
 
     @Override
-    public String createCustomerAndReturnId(String name, String email, String phone) {
-        // 输入参数校验
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Customer name cannot be null or empty.");
-        }
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Customer email cannot be null or empty.");
-        }
-        if (!isValidEmail(email)) {
-            throw new IllegalArgumentException("Invalid email format.");
-        }
-        if (phone != null &&!isValidPhone(phone)) {
-            throw new IllegalArgumentException("Invalid phone number format.");
+    public String createCustomer(String name, String email, String phone) {
+        // 参数校验
+        validateNotEmpty(name, "客户姓名");
+        validateNotEmpty(email, "邮箱");
+        validateFormat(email, EMAIL_REGEX, ErrorCode.EMAIL_FORMAT_ERROR);
+        if (phone != null) validateFormat(phone, PHONE_REGEX, ErrorCode.PHONE_FORMAT_ERROR);
+
+        // 检查邮箱唯一性
+        if (lambdaQuery().eq(Customers::getEmail, email).one() != null) {
+            throw new BusinessException(ErrorCode.EMAIL_EXISTS);
         }
 
-        // 检查 email 是否已存在
-        LambdaQueryWrapper<Customers> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Customers::getEmail, email);
-        Customers existingCustomer = this.getOne(queryWrapper);
+        // 创建客户
+        Customers customer = new Customers();
+        customer.setCustomerId(UUID.randomUUID().toString());
+        customer.setName(name);
+        customer.setEmail(email);
+        customer.setPhone(phone);
 
-        if (existingCustomer != null) {
-            return null; // Email 已存在，返回 null 表示创建失败
+        if (!save(customer)) {
+            log.error("客户创建失败：{}", customer);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "客户创建失败");
         }
-
-        // 创建客户对象
-        Customers newCustomer = new Customers();
-        String customerId = UUID.randomUUID().toString(); // 生成唯一 ID
-        newCustomer.setCustomerID(customerId);
-        newCustomer.setName(name);
-        newCustomer.setEmail(email);
-        newCustomer.setPhone(phone);
-
-        try {
-            boolean result = this.save(newCustomer);
-            return result ? customerId : null; // 插入成功返回客户 ID，失败返回 null
-        } catch (Exception e) {
-            // 记录异常日志，实际项目中可以使用日志框架（如 Log4j、SLF4J 等）
-            System.err.println("Error creating customer: " + e.getMessage());
-            return null;
-        }
+        return customer.getCustomerId();
     }
 
     @Override
-    public boolean updateCustomerInfo(String customerID, String name, String email, String phone) {
-        // 输入参数校验
-        if (customerID == null || customerID.trim().isEmpty()) {
-            throw new IllegalArgumentException("Customer ID cannot be null or empty.");
-        }
-        if (name != null && name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Customer name cannot be empty.");
-        }
-        if (email != null &&!isValidEmail(email)) {
-            throw new IllegalArgumentException("Invalid email format.");
-        }
-        if (phone != null &&!isValidPhone(phone)) {
-            throw new IllegalArgumentException("Invalid phone number format.");
+    public void updateCustomer(String customerID, String name, String email, String phone) {
+        // 参数校验
+        validateNotEmpty(customerID, "客户ID");
+        if (email != null) validateFormat(email, EMAIL_REGEX, ErrorCode.EMAIL_FORMAT_ERROR);
+        if (phone != null) validateFormat(phone, PHONE_REGEX, ErrorCode.PHONE_FORMAT_ERROR);
+
+        // 获取现有客户
+        Customers customer = lambdaQuery()
+                .eq(Customers::getCustomerId, customerID)
+                .oneOpt()
+                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND));
+
+        // 邮箱冲突检查
+        if (email != null && !email.equals(customer.getEmail())) {
+            if (lambdaQuery().eq(Customers::getEmail, email).exists()) {
+                throw new BusinessException(ErrorCode.EMAIL_EXISTS);
+            }
         }
 
-        try {
-            // 查询是否存在该客户
-            Customers customer = this.getById(customerID);
-            if (customer == null) {
-                return false; // 客户不存在
-            }
+        // 更新字段
+        boolean updated = lambdaUpdate()
+                .eq(Customers::getCustomerId, customerID)
+                .set(name != null && !name.isEmpty(), Customers::getName, name)
+                .set(email != null && !email.isEmpty(), Customers::getEmail, email)
+                .set(phone != null && !phone.isEmpty(), Customers::getPhone, phone)
+                .update();
 
-            // 检查新邮箱是否已被其他客户使用
-            if (email != null &&!email.equals(customer.getEmail())) {
-                LambdaQueryWrapper<Customers> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.eq(Customers::getEmail, email)
-                        .ne(Customers::getCustomerID, customerID);
-                Customers existingCustomerWithEmail = this.getOne(queryWrapper);
-                if (existingCustomerWithEmail != null) {
-                    throw new IllegalArgumentException("Email is already in use by another customer.");
-                }
-            }
-
-            // 更新信息
-            if (name != null) {
-                customer.setName(name);
-            }
-            if (email != null) {
-                customer.setEmail(email);
-            }
-            if (phone != null) {
-                customer.setPhone(phone);
-            }
-
-            return this.updateById(customer);
-        } catch (Exception e) {
-            // 记录异常日志，实际项目中可以使用日志框架（如 Log4j、SLF4J 等）
-            System.err.println("Error updating customer information: " + e.getMessage());
-            return false;
+        if (!updated) {
+            log.warn("客户信息更新失败：{}", customerID);
+            throw new BusinessException(ErrorCode.UPDATE_FAILED);
         }
     }
 
     @Override
     public Customers getCustomerByIdOrEmail(String customerID, String email) {
-        // 输入参数校验
+        // 参数校验
         if (customerID == null && email == null) {
-            throw new IllegalArgumentException("At least one parameter (customerID or email) must be provided.");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "至少提供一个查询参数");
         }
 
-        LambdaQueryWrapper<Customers> queryWrapper = new LambdaQueryWrapper<>();
-        if (customerID != null) {
-            queryWrapper.eq(Customers::getCustomerID, customerID);
-        } else {
-            queryWrapper.eq(Customers::getEmail, email);
-        }
+        return lambdaQuery()
+                .eq(customerID != null, Customers::getCustomerId, customerID)
+                .eq(email != null, Customers::getEmail, email)
+                .oneOpt()
+                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND));
+    }
 
-        try {
-            return this.getOne(queryWrapper, false);
-        } catch (Exception e) {
-            // 记录异常日志，实际项目中可以使用日志框架（如 Log4j、SLF4J 等）
-            System.err.println("Error getting customer by ID or email: " + e.getMessage());
-            return null;
+    // 通用校验方法
+    private void validateNotEmpty(String value, String field) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, field + "不能为空");
         }
     }
 
-    // 校验邮箱格式
-    private boolean isValidEmail(String email) {
-        return EMAIL_PATTERN.matcher(email).matches();
-    }
-
-    // 校验电话号码格式
-    private boolean isValidPhone(String phone) {
-        return PHONE_PATTERN.matcher(phone).matches();
+    private void validateFormat(String value, Pattern pattern, ErrorCode errorCode) {
+        if (!pattern.matcher(value).matches()) {
+            throw new BusinessException(errorCode);
+        }
     }
 }

@@ -1,139 +1,104 @@
 package com.yunzhi.retailmanagementsystem.controller;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Goods;
+import com.yunzhi.retailmanagementsystem.model.domain.dto.GoodsCreateDTO;
+import com.yunzhi.retailmanagementsystem.model.domain.dto.GoodsUpdateDTO;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Goods;
+import com.yunzhi.retailmanagementsystem.model.domain.vo.GoodsResponseVO;
+import com.yunzhi.retailmanagementsystem.model.domain.vo.GoodsVO;
+import com.yunzhi.retailmanagementsystem.model.domain.vo.PaginationVO;
+import com.yunzhi.retailmanagementsystem.response.BaseResponse;
+import com.yunzhi.retailmanagementsystem.response.ResultUtils;
 import com.yunzhi.retailmanagementsystem.service.GoodsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/goods")
+@RequiredArgsConstructor
 public class GoodsController {
 
-    @Autowired
-    private GoodsService goodsService;
+    private final GoodsService goodsService;
 
-    // 2.3.1 添加货物
+    //━━━━━━━━━━━━━━ 端点实现 ━━━━━━━━━━━━━━
     @PostMapping
-    public ResponseEntity<Map<String, Object>> addGoods(@RequestBody Map<String, Object> requestBody) {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            String name = (String) requestBody.get("name");
-            String description = (String) requestBody.get("description");
-            BigDecimal price = new BigDecimal(requestBody.get("price").toString());
-            Integer quantity = (Integer) requestBody.get("quantity");
-
-            if (price.compareTo(BigDecimal.ZERO) <= 0 || quantity < 0) {
-                response.put("error", "InvalidRequestBody");
-                response.put("message", "Price must be greater than 0 and quantity must be a non-negative integer.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            // 调用服务层方法，获取返回的 Goods 对象
-            Goods goods = goodsService.addGoods(name, description, quantity, price);
-
-            if (goods != null) {
-                response.put("goodID", goods.getGoodID());
-                response.put("message", "Good added successfully.");
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            } else {
-                // 商品名称已存在，添加失败
-                response.put("error", "DuplicateProductName");
-                response.put("message", "A product with the same name already exists.");
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-            }
-        } catch (Exception e) {
-            response.put("error", "InternalServerError");
-            response.put("message", "An unexpected error occurred. Please try again later.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+    public BaseResponse<String> addGoods(@RequestBody @Valid GoodsCreateDTO dto) {
+        Goods goods = goodsService.addGoods(dto.name(), dto.description(), dto.quantity(), dto.price());
+        return ResultUtils.success(goods.getGoodId(), "商品添加成功");
     }
-    // 2.3.2 更新货物信息
+
     @PutMapping("/{goodID}")
-    public ResponseEntity<Map<String, Object>> updateGoods(@PathVariable String goodID, @RequestBody Map<String, Object> requestBody) {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            Goods existingGoods = goodsService.getGoodsById(goodID);
-            if (existingGoods == null) {
-                response.put("error", "goodNotFound");
-                response.put("message", "The good with ID '" + goodID + "' does not exist.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-
-            String description = (String) requestBody.get("description");
-            BigDecimal price = new BigDecimal(requestBody.get("price").toString());
-            Integer quantity = (Integer) requestBody.get("quantity");
-
-            if (price.compareTo(BigDecimal.ZERO) <= 0 || quantity < 0) {
-                response.put("error", "InvalidRequestBody");
-                response.put("message", "Price must be greater than 0 and quantity must be a non-negative integer.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            existingGoods.setDescription(description);
-            existingGoods.setPrice(price);
-            existingGoods.setQuantity(quantity);
-
-            boolean isUpdated = goodsService.updateGoods(existingGoods.getGoodID(), existingGoods.getName(), existingGoods.getDescription(), existingGoods.getQuantity(), existingGoods.getPrice());
-            if (isUpdated) {
-                response.put("goodID", existingGoods.getGoodID());
-                response.put("message", "good updated successfully.");
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("error", "InternalServerError");
-                response.put("message", "An unexpected error occurred. Please try again later.");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-            }
-        } catch (Exception e) {
-            response.put("error", "InternalServerError");
-            response.put("message", "An unexpected error occurred. Please try again later.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+    public BaseResponse<Void> updateGoods(@PathVariable String goodID, @RequestBody @Valid GoodsUpdateDTO dto) {
+        goodsService.updateGoods(goodID, dto.name(), dto.description(), dto.quantity(), dto.price());
+        return ResultUtils.success("商品信息更新成功");
     }
 
-    // 2.3.3 查询货物
+    @GetMapping("/{goodID}")
+    public BaseResponse<GoodsVO> getGoodsById(@PathVariable String goodID) {
+        Goods goods = goodsService.getGoodsById(goodID);
+        return ResultUtils.success(GoodsVO.fromGoods(goods), null);
+    }
+
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getGoods(
+    public BaseResponse<GoodsResponseVO> getGoods(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
 
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
-                response.put("error", "InvalidQueryParameters");
-                response.put("message", "Minimum price cannot be greater than maximum price.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            List<Goods> goodsList = goodsService.getGoodsByName(name);
-            // 这里可以根据minPrice和maxPrice进一步过滤goodsList
-            // 这里可以根据page和pageSize进行分页处理
-
-            response.put("goods", goodsList);
-            response.put("pagination", Map.of(
-                    "currentPage", page,
-                    "totalPages", (int) Math.ceil((double) goodsList.size() / pageSize),
-                    "pageSize", pageSize,
-                    "totalItems", goodsList.size()
-            ));
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", "InternalServerError");
-            response.put("message", "An unexpected error occurred. Please try again later.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        if (!isValidQueryParameters(minPrice, maxPrice)) {
+            return ResultUtils.error(HttpStatus.BAD_REQUEST.value(), "查询参数无效", "最低价格不能大于最高价格");
         }
+
+        List<Goods> goodsList = goodsService.getGoodsByName(name);
+
+        if (minPrice != null || maxPrice != null) {
+            goodsList = filterGoodsByPrice(goodsList, minPrice, maxPrice);
+        }
+
+        List<Goods> paginatedGoodsList = paginateGoodsList(goodsList, page, pageSize);
+
+        List<GoodsVO> goodsVOs = paginatedGoodsList.stream()
+                .map(GoodsVO::fromGoods)
+                .collect(Collectors.toList());
+
+        PaginationVO pagination = new PaginationVO(
+                page,
+                (int) Math.ceil((double) goodsList.size() / pageSize),
+                pageSize,
+                goodsList.size()
+        );
+
+        GoodsResponseVO responseVO = new GoodsResponseVO(goodsVOs, pagination);
+        return ResultUtils.success(responseVO, null);
+    }
+
+    //━━━━━━━━━━━━━━ 工具方法 ━━━━━━━━━━━━━━
+    private boolean isValidQueryParameters(BigDecimal minPrice, BigDecimal maxPrice) {
+        return minPrice == null || maxPrice == null || minPrice.compareTo(maxPrice) <= 0;
+    }
+
+    private List<Goods> filterGoodsByPrice(List<Goods> goodsList, BigDecimal minPrice, BigDecimal maxPrice) {
+        return goodsList.stream()
+                .filter(goods -> {
+                    boolean meetsMinPrice = minPrice == null || goods.getPrice().compareTo(minPrice) >= 0;
+                    boolean meetsMaxPrice = maxPrice == null || goods.getPrice().compareTo(maxPrice) <= 0;
+                    return meetsMinPrice && meetsMaxPrice;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Goods> paginateGoodsList(List<Goods> goodsList, int page, int pageSize) {
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, goodsList.size());
+        return goodsList.subList(startIndex, endIndex);
     }
 }

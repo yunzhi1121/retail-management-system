@@ -1,6 +1,6 @@
 package com.yunzhi.retailmanagementsystem.service;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Tracking;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Tracking;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

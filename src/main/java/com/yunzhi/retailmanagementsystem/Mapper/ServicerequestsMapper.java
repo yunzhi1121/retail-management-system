@@ -1,6 +1,6 @@
 package com.yunzhi.retailmanagementsystem.Mapper;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Servicerequests;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Servicerequests;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;

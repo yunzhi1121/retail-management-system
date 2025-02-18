@@ -1,209 +1,138 @@
 package com.yunzhi.retailmanagementsystem.controller;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Goods;
-import com.yunzhi.retailmanagementsystem.model.domain.OrderGood;
-import com.yunzhi.retailmanagementsystem.model.domain.Orders;
-import com.yunzhi.retailmanagementsystem.service.GoodsService;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Customers;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Goods;
+import com.yunzhi.retailmanagementsystem.model.domain.po.OrderGood;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Orders;
+import com.yunzhi.retailmanagementsystem.model.domain.dto.OrderCreateDTO;
+import com.yunzhi.retailmanagementsystem.model.domain.dto.OrderUpdateDTO;
+import com.yunzhi.retailmanagementsystem.model.domain.vo.OrderDetailVO;
+import com.yunzhi.retailmanagementsystem.model.domain.vo.OrderItemVO;
+import com.yunzhi.retailmanagementsystem.model.domain.vo.OrderVO;
+import com.yunzhi.retailmanagementsystem.response.BaseResponse;
+import com.yunzhi.retailmanagementsystem.response.ResultUtils;
+import com.yunzhi.retailmanagementsystem.service.CustomersService;
 import com.yunzhi.retailmanagementsystem.service.OrdersService;
+import com.yunzhi.retailmanagementsystem.utils.VOConverter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/orders")
+@RequiredArgsConstructor
+@Tag(name = "订单管理", description = "订单创建、查询、更新等操作")
 public class OrdersController {
-
     @Autowired
     private OrdersService ordersService;
     @Autowired
-    private GoodsService goodsService;
+    private CustomersService customersService;
 
-    // 1 创建订单
+    //━━━━━━━━━━━━━━ 端点实现 ━━━━━━━━━━━━━━
+    @Operation(summary = "创建订单")
     @PostMapping
-    public ResponseEntity<Object> createOrder(@RequestBody Map<String, Object> requestBody) {
-        try {
-            String customerID = (String) requestBody.get("customerID");
-            List<Map<String, Object>> items = (List<Map<String, Object>>) requestBody.get("items");
-            String paymentMethod = (String) requestBody.get("paymentMethod");
-            String deliveryMethod = (String) requestBody.get("deliveryMethod");
-            String remarks = (String) requestBody.get("remarks");
+    public ResponseEntity<BaseResponse<OrderVO>> createOrder(
+            @RequestBody @Valid OrderCreateDTO dto
+    ) {
+        // DTO 转服务层参数
+        Map<String, Integer> itemMap = VOConverter.convertItemsToMap(dto.items());
 
-            Map<String, Integer> goodQuantities = new HashMap<>();
-            for (Map<String, Object> item : items) {
-                String goodID = (String) item.get("goodID");
-                int quantity = (int) item.get("quantity");
-                goodQuantities.put(goodID, quantity);
-            }
+        // 调用服务层
+        Orders order = ordersService.createOrder(
+                dto.customerId(),
+                itemMap,
+                dto.paymentMethod(),
+                dto.deliveryMethod(),
+                dto.remarks()
+        );
 
-            Orders order = ordersService.createOrder(customerID, goodQuantities, paymentMethod, deliveryMethod, remarks);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("orderID", order.getOrderID());
-            response.put("message", "Order created successfully.");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "400");
-            errorResponse.put("errorMessage", e.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "400");
-            errorResponse.put("errorMessage", "Invalid input data.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+        // 领域模型转 VO
+        return ResponseEntity.ok(ResultUtils.success(VOConverter.convertToOrderVO(order), null));
     }
 
-    // 更新订单信息
-    @PutMapping("/{orderID}/update/")
-    public ResponseEntity<Object> updateOrder(@PathVariable String orderID, @RequestBody Map<String, Object> requestBody) {
-        try {
-            // 从请求体中获取新的商品列表
-            List<Map<String, Object>> items = (List<Map<String, Object>>) requestBody.get("items");
-            Map<String, Integer> newGoodQuantities = new HashMap<>();
-            if (items != null) {
-                for (Map<String, Object> item : items) {
-                    String goodID = (String) item.get("goodID");
-                    int quantity = ((Number) item.get("quantity")).intValue();
-                    newGoodQuantities.put(goodID, quantity);
-                }
-            }
+    @Operation(summary = "获取订单详情")
+    @GetMapping("/{orderId}")
+    public ResponseEntity<BaseResponse<OrderDetailVO>> getOrderDetail(
+            @PathVariable @NotBlank String orderId
+    ) {
+        Orders order = ordersService.getOrderDetail(orderId);
+        Customers customer = customersService.getCustomerByIdOrEmail(order.getCustomerId(), null);
 
-            // 从请求体中获取新的支付方式
-            String newPaymentMethod = (String) requestBody.get("paymentMethod");
-            String deliveryMethod = (String) requestBody.get("deliveryMethod");
-            String remarks = (String) requestBody.get("remarks");
+        // 获取订单商品关联记录
+        List<OrderGood> orderGoods = ordersService.getOrderGoodsByOrderId(orderId);
 
-            // 调用服务层的 updateOrder 方法更新订单信息
-            boolean success = ordersService.updateOrder(orderID, newGoodQuantities, newPaymentMethod, deliveryMethod, remarks);
+        // 转换商品条目为 VO
+        List<OrderItemVO> items = VOConverter.convertToItemVOs(
+                orderGoods,
+                goodIds -> ordersService.batchGetGoodsByIds(goodIds)
+                        .stream()
+                        .collect(Collectors.toMap(Goods::getGoodId, Function.identity()))
+        );
 
-            if (success) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("orderID", orderID);
-                response.put("message", "Order information updated successfully.");
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("errorCode", "400");
-                errorResponse.put("errorMessage", "Failed to update order information. Order may be in an invalid status or insufficient stock.");
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-            }
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "400");
-            errorResponse.put("errorMessage", e.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "500");
-            errorResponse.put("errorMessage", "An unexpected error occurred.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        OrderDetailVO vo = new OrderDetailVO(
+                order.getOrderId(),
+                customer.getName(),
+                items,
+                order.getTotalAmount(),
+                order.getPaymentMethod(),
+                order.getDeliveryMethod(),
+                order.getStatus(),
+                order.getOrderDate()
+        );
+
+        return ResponseEntity.ok(ResultUtils.success(vo, "订单创建成功"));
     }
 
-    // 取消订单
-    @DeleteMapping("/{orderID}/cancel")
-    public ResponseEntity<Object> cancelOrder(@PathVariable String orderID) {
-        try {
-            boolean success = ordersService.cancelOrder(orderID);
-            if (success) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("orderID", orderID);
-                response.put("message", "Order canceled successfully.");
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("errorCode", "400");
-                errorResponse.put("errorMessage", "Failed to cancel order.");
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-            }
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "400");
-            errorResponse.put("errorMessage", e.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "500");
-            errorResponse.put("errorMessage", "An unexpected error occurred.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @Operation(summary = "更新订单")
+    @PutMapping("/{orderId}")
+    public ResponseEntity<BaseResponse<Void>> updateOrder(
+            @PathVariable String orderId,
+            @RequestBody @Valid OrderUpdateDTO dto
+    ) {
+        Map<String, Integer> itemMap = VOConverter.convertItemsToMap(dto.items());
+
+        ordersService.updateOrder(
+                orderId,
+                itemMap,
+                dto.paymentMethod(),
+                dto.deliveryMethod(),
+                dto.remarks()
+        );
+
+        return ResponseEntity.ok(ResultUtils.success("订单修改成功"));
     }
 
-    // 查询订单
-    @GetMapping("/{orderID}")
-    public ResponseEntity<Object> getOrder(@PathVariable String orderID) {
-        try {
-            Orders order = ordersService.getOrderById(orderID);
-            if (order == null) {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("errorCode", "404");
-                errorResponse.put("errorMessage", "Order not found.");
-                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-            }
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("orderID", order.getOrderID());
-            response.put("customerID", order.getCustomerID());
-
-            List<Map<String, Object>> items = new ArrayList<>();
-            List<OrderGood> orderGoods = ordersService.getOrderGoodsByOrderId(orderID);
-            for (OrderGood orderGood : orderGoods) {
-                Goods good = goodsService.getGoodsById(orderGood.getGoodID());
-                Map<String, Object> item = new HashMap<>();
-                item.put("goodID", good.getGoodID());
-                item.put("name", good.getName());
-                item.put("quantity", orderGood.getQuantity());
-                item.put("price", good.getPrice());
-                items.add(item);
-            }
-            response.put("items", items);
-            response.put("totalAmount", order.getTotalAmount());
-            response.put("paymentMethod", order.getPaymentMethod());
-            response.put("deliveryMethod", order.getDeliveryMethod());
-            response.put("status", order.getStatus());
-            response.put("createdAt", order.getOrderDate());
-            response.put("updatedAt", new Date());
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "500");
-            errorResponse.put("errorMessage", "An unexpected error occurred.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @Operation(summary = "取消订单")
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<BaseResponse<Void>> cancelOrder(
+            @PathVariable @NotBlank String orderId
+    ) {
+        ordersService.cancelOrder(orderId);
+        return ResponseEntity.ok(ResultUtils.success("订单已取消"));
     }
 
-    // 查询用户所有订单
-    @GetMapping("/customer/{customerID}")
-    public ResponseEntity<Object> getOrdersByCustomer(@PathVariable String customerID) {
-        try {
-            List<Orders> orders = ordersService.getOrdersByCustomer(customerID);
-            List<Map<String, Object>> responseList = new ArrayList<>();
-            for (Orders order : orders) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("orderID", order.getOrderID());
-                response.put("totalAmount", order.getTotalAmount());
-                response.put("status", order.getStatus());
-                response.put("createdAt", order.getOrderDate());
-                responseList.add(response);
-            }
-            return new ResponseEntity<>(responseList, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "400");
-            errorResponse.put("errorMessage", e.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("errorCode", "500");
-            errorResponse.put("errorMessage", "An unexpected error occurred.");
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    @Operation(summary = "获取客户订单列表")
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<BaseResponse<List<OrderVO>>> getCustomerOrders(
+            @PathVariable @NotBlank String customerId
+    ) {
+        List<Orders> orders = ordersService.getCustomerOrders(customerId);
+        List<OrderVO> vos = orders.stream()
+                .map(VOConverter::convertToOrderVO)
+                .collect(Collectors.toList());
 
+        return ResponseEntity.ok(ResultUtils.success(vos, "客户订单列表获取成功"));
+    }
 }

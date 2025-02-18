@@ -1,8 +1,7 @@
 package com.yunzhi.retailmanagementsystem.Mapper;
 
-import com.yunzhi.retailmanagementsystem.model.domain.Tracking;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Tracking;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 /**

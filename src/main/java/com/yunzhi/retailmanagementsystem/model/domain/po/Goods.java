@@ -1,4 +1,4 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 
@@ -13,12 +14,13 @@ import lombok.Data;
  */
 @TableName(value ="goods")
 @Data
+@Accessors(chain = true)
 public class Goods implements Serializable {
     /**
      * 商品ID，唯一标识一个商品
      */
     @TableId
-    private String goodID;
+    private String goodId;
 
     /**
      * 商品名称，用于展示商品的信息
@@ -62,7 +64,7 @@ public class Goods implements Serializable {
             return false;
         }
         Goods other = (Goods) that;
-        return (this.getGoodID() == null ? other.getGoodID() == null : this.getGoodID().equals(other.getGoodID()))
+        return (this.getGoodId() == null ? other.getGoodId() == null : this.getGoodId().equals(other.getGoodId()))
             && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
             && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
             && (this.getQuantity() == null ? other.getQuantity() == null : this.getQuantity().equals(other.getQuantity()))
@@ -73,7 +75,7 @@ public class Goods implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getGoodID() == null) ? 0 : getGoodID().hashCode());
+        result = prime * result + ((getGoodId() == null) ? 0 : getGoodId().hashCode());
         result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
         result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
         result = prime * result + ((getQuantity() == null) ? 0 : getQuantity().hashCode());
@@ -87,7 +89,7 @@ public class Goods implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", goodID=").append(goodID);
+        sb.append(", goodID=").append(goodId);
         sb.append(", name=").append(name);
         sb.append(", description=").append(description);
         sb.append(", quantity=").append(quantity);

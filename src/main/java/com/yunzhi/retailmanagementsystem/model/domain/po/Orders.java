@@ -1,4 +1,4 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 
@@ -16,17 +16,18 @@ import lombok.Data;
  */
 @TableName(value ="orders")
 @Data
+@Accessors(chain = true)
 public class Orders implements Serializable {
     /**
      *  订单ID
      */
     @TableId
-    private String orderID;
+    private String orderId;
 
     /**
      *  客户ID
      */
-    private String customerID;
+    private String customerId;
 
     /**
      *  订单日期
@@ -75,8 +76,8 @@ public class Orders implements Serializable {
             return false;
         }
         Orders other = (Orders) that;
-        return (this.getOrderID() == null ? other.getOrderID() == null : this.getOrderID().equals(other.getOrderID()))
-            && (this.getCustomerID() == null ? other.getCustomerID() == null : this.getCustomerID().equals(other.getCustomerID()))
+        return (this.getOrderId() == null ? other.getOrderId() == null : this.getOrderId().equals(other.getOrderId()))
+            && (this.getCustomerId() == null ? other.getCustomerId() == null : this.getCustomerId().equals(other.getCustomerId()))
             && (this.getOrderDate() == null ? other.getOrderDate() == null : this.getOrderDate().equals(other.getOrderDate()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
             && (this.getTotalAmount() == null ? other.getTotalAmount() == null : this.getTotalAmount().equals(other.getTotalAmount()))
@@ -98,8 +99,8 @@ public class Orders implements Serializable {
 
         // 以下代码逐个处理对象的属性，使用三元运算符避免因属性为null而引发的NullPointerException
         // 对于每个属性，如果为null，则对该属性的哈希码贡献为0；否则，调用该属性的hashCode方法获取哈希码
-        result = prime * result + ((getOrderID() == null) ? 0 : getOrderID().hashCode());
-        result = prime * result + ((getCustomerID() == null) ? 0 : getCustomerID().hashCode());
+        result = prime * result + ((getOrderId() == null) ? 0 : getOrderId().hashCode());
+        result = prime * result + ((getCustomerId() == null) ? 0 : getCustomerId().hashCode());
         result = prime * result + ((getOrderDate() == null) ? 0 : getOrderDate().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getTotalAmount() == null) ? 0 : getTotalAmount().hashCode());
@@ -129,10 +130,10 @@ public class Orders implements Serializable {
         sb.append("Hash = ").append(hashCode());
 
         // 添加订单ID
-        sb.append(", orderID=").append(orderID);
+        sb.append(", orderID=").append(orderId);
 
         // 添加客户ID
-        sb.append(", customerID=").append(customerID);
+        sb.append(", customerID=").append(customerId);
 
         // 添加订单日期
         sb.append(", orderDate=").append(orderDate);

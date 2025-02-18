@@ -1,11 +1,12 @@
 package com.yunzhi.retailmanagementsystem.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yunzhi.retailmanagementsystem.model.domain.Goods;
-import com.yunzhi.retailmanagementsystem.service.GoodsService;
 import com.yunzhi.retailmanagementsystem.Mapper.GoodsMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.yunzhi.retailmanagementsystem.exception.BusinessException;
+import com.yunzhi.retailmanagementsystem.response.ErrorCode;
+import com.yunzhi.retailmanagementsystem.model.domain.po.Goods;
+import com.yunzhi.retailmanagementsystem.service.GoodsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,68 +14,80 @@ import java.util.List;
 import java.util.UUID;
 
 /**
-* @author Chloe
-* @description 针对表【goods】的数据库操作Service实现
-* @createDate 2025-01-12 17:32:29
-*/
+ * 货物管理服务实现类
+ */
 @Service
-public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements GoodsService{
+@Slf4j
+public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements GoodsService {
 
-    @Autowired
-    private GoodsMapper goodsMapper;
-
+    @Override
     public Goods addGoods(String name, String description, Integer quantity, BigDecimal price) {
-        // 先查询数据库中是否存在同名商品
-        LambdaQueryWrapper<Goods> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Goods::getName, name);
-        List<Goods> existingGoods = this.list(queryWrapper);
+        // 参数校验
+        validateGoodsParameters(name, quantity, price);
 
-        if (!existingGoods.isEmpty()) {
-            // 如果存在同名商品，返回 null 表示添加失败
-            return null;
+        // 检查是否已存在同名商品
+        if (lambdaQuery().eq(Goods::getName, name).exists()) {
+            throw new BusinessException(ErrorCode.GOODS_EXISTS, "商品名称已存在");
         }
 
-        String goodID = UUID.randomUUID().toString();
         Goods goods = new Goods();
-        goods.setGoodID(goodID);
-
+        goods.setGoodId(UUID.randomUUID().toString());
         goods.setName(name);
         goods.setDescription(description);
         goods.setQuantity(quantity);
         goods.setPrice(price);
 
-        // 尝试保存商品信息
-        if (this.save(goods)) {
-            return goods; // 返回保存成功的商品对象，包含 goodID
-        } else {
-            return null; // 如果保存失败，返回 null
+        if (!save(goods)) {
+            log.error("商品添加失败: {}", goods);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "添加商品失败");
+        }
+
+        return goods;
+    }
+
+    @Override
+    public void updateGoods(String goodID, String name, String description, Integer quantity, BigDecimal price) {
+        validateGoodsParameters(name, quantity, price);
+
+        Goods goods = lambdaQuery().eq(Goods::getGoodId, goodID).oneOpt()
+                .orElseThrow(() -> new BusinessException(ErrorCode.GOODS_NOT_FOUND, "商品ID不存在"));
+        // 检查是否已存在同名商品
+        if (lambdaQuery().eq(Goods::getName, name).exists()) {
+            throw new BusinessException(ErrorCode.GOODS_EXISTS, "商品名称已存在");
+        }
+        boolean updated = lambdaUpdate()
+                .eq(Goods::getGoodId, goodID)
+                .set(name != null, Goods::getName, name)
+                .set(description != null, Goods::getDescription, description)
+                .set(quantity != null, Goods::getQuantity, quantity)
+                .set(price != null, Goods::getPrice, price)
+                .update();
+
+        if (!updated) {
+            throw new BusinessException(ErrorCode.UPDATE_FAILED, "商品更新失败");
         }
     }
 
-    public boolean updateGoods(String goodID, String name, String description, Integer quantity, BigDecimal price) {
-        Goods goods = new Goods();
-        goods.setGoodID(goodID);
-        goods.setName(name);
-        goods.setDescription(description);
-        goods.setQuantity(quantity);
-        goods.setPrice(price);
-        return this.updateById(goods);
-    }
-
+    @Override
     public Goods getGoodsById(String goodID) {
-        return this.getById(goodID);
+        return lambdaQuery().eq(Goods::getGoodId, goodID).oneOpt()
+                .orElseThrow(() -> new BusinessException(ErrorCode.GOODS_NOT_FOUND, "商品ID不存在"));
     }
 
+    @Override
     public List<Goods> getGoodsByName(String name) {
-        LambdaQueryWrapper<Goods> queryWrapper = new LambdaQueryWrapper<>();
-        // 使用 like 方法构建模糊查询条件
-        if (name != null && !name.isEmpty()) {
-            queryWrapper.like(Goods::getName, name);
+        return lambdaQuery().like(Goods::getName, name).list();
+    }
+
+    private void validateGoodsParameters(String name, Integer quantity, BigDecimal price) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "商品名称不能为空");
         }
-        return this.list(queryWrapper);
+        if (quantity == null || quantity < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "商品数量不能小于 0");
+        }
+        if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "商品价格必须大于 0");
+        }
     }
 }
-
-
-
-

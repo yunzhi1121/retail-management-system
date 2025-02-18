@@ -13,3 +13,5 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
   configuration:
     map-underscore-to-camel-case: false
+    default-executor-type: batch # 启用批处理模式
+    database-id: mysql

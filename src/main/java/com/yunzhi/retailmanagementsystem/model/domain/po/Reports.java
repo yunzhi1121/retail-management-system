@@ -1,4 +1,4 @@
-package com.yunzhi.retailmanagementsystem.model.domain;
+package com.yunzhi.retailmanagementsystem.model.domain.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -18,12 +18,12 @@ public class Reports implements Serializable {
      * 
      */
     @TableId
-    private String reportID;
+    private String reportId;
 
     /**
      * 
      */
-    private String userID;
+    private String userId;
 
     /**
      * 
@@ -50,8 +50,8 @@ public class Reports implements Serializable {
             return false;
         }
         Reports other = (Reports) that;
-        return (this.getReportID() == null ? other.getReportID() == null : this.getReportID().equals(other.getReportID()))
-            && (this.getUserID() == null ? other.getUserID() == null : this.getUserID().equals(other.getUserID()))
+        return (this.getReportId() == null ? other.getReportId() == null : this.getReportId().equals(other.getReportId()))
+            && (this.getUserId() == null ? other.getUserId() == null : this.getUserId().equals(other.getUserId()))
             && (this.getParameters() == null ? other.getParameters() == null : this.getParameters().equals(other.getParameters()))
             && (this.getGeneratedDate() == null ? other.getGeneratedDate() == null : this.getGeneratedDate().equals(other.getGeneratedDate()));
     }
@@ -60,8 +60,8 @@ public class Reports implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getReportID() == null) ? 0 : getReportID().hashCode());
-        result = prime * result + ((getUserID() == null) ? 0 : getUserID().hashCode());
+        result = prime * result + ((getReportId() == null) ? 0 : getReportId().hashCode());
+        result = prime * result + ((getUserId() == null) ? 0 : getUserId().hashCode());
         result = prime * result + ((getParameters() == null) ? 0 : getParameters().hashCode());
         result = prime * result + ((getGeneratedDate() == null) ? 0 : getGeneratedDate().hashCode());
         return result;
@@ -73,8 +73,8 @@ public class Reports implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", reportID=").append(reportID);
-        sb.append(", userID=").append(userID);
+        sb.append(", reportID=").append(reportId);
+        sb.append(", userID=").append(userId);
         sb.append(", parameters=").append(parameters);
         sb.append(", generatedDate=").append(generatedDate);
         sb.append(", serialVersionUID=").append(serialVersionUID);
