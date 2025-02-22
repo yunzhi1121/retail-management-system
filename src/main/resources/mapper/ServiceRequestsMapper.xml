@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunzhi.retailmanagementsystem.business.request.mapper.ServiceRequestsMapper">
+
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.business.request.model.po.ServiceRequests">
+            <id property="requestId" column="RequestID" jdbcType="VARCHAR"/>
+            <result property="customerId" column="CustomerID" jdbcType="VARCHAR"/>
+            <result property="description" column="Description" jdbcType="VARCHAR"/>
+            <result property="status" column="Status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        RequestID,CustomerID,Description,
+        Status
+    </sql>
+
+    <!-- 根据客户ID查询服务请求列表 -->
+    <select id="selectByCustomerId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM serviceRequests
+        WHERE CustomerID = #{customerId}
+    </select>
+
+    <!-- 根据服务请求状态查询服务请求列表 -->
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM serviceRequests
+        WHERE Status = #{status}
+    </select>
+
+    <!-- 根据服务请求ID查询服务请求 -->
+    <select id="selectByRequestId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM serviceRequests
+        WHERE RequestID = #{requestId}
+    </select>
+
+</mapper>

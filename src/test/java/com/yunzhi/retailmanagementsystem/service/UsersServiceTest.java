@@ -1,6 +1,7 @@
 package com.yunzhi.retailmanagementsystem.service;
 
-import com.yunzhi.retailmanagementsystem.model.domain.po.Users;
+import com.yunzhi.retailmanagementsystem.business.user.service.UsersService;
+import com.yunzhi.retailmanagementsystem.business.user.model.po.Users;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

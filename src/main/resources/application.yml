@@ -7,11 +7,16 @@ spring:
     url: jdbc:mysql://localhost:3306/retail_management_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: 123456
+  main:
+    allow-bean-definition-overriding: true
 server:
   port: 8080
 mybatis-plus:
-  mapper-locations: classpath:/mapper/*.xml
+  mapper-locations: mapper/*.xml
   configuration:
     map-underscore-to-camel-case: false
     default-executor-type: batch # 启用批处理模式
     database-id: mysql
+logging:
+  level:
+    com.baomidou.mybatisplus: DEBUG

@@ -5,7 +5,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.yunzhi.retailmanagementsystem.Mapper")
+@MapperScan({
+        "com.yunzhi.retailmanagementsystem.business.**.mapper"
+})
 public class RetailManagementSystemApplication {
 
     public static void main(String[] args) {

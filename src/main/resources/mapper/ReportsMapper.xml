@@ -2,13 +2,14 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yunzhi.retailmanagementsystem.Mapper.ReportsMapper">
+<mapper namespace="com.yunzhi.retailmanagementsystem.business.report.mapper.ReportsMapper">
 
-    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.model.domain.po.Reports">
+    <resultMap id="BaseResultMap" type="com.yunzhi.retailmanagementsystem.business.report.model.po.Reports">
             <id property="reportId" column="ReportID" jdbcType="VARCHAR"/>
             <result property="userId" column="UserID" jdbcType="VARCHAR"/>
             <result property="parameters" column="Parameters" jdbcType="VARCHAR"/>
             <result property="generatedDate" column="GeneratedDate" jdbcType="TIMESTAMP"/>
+            <result property="reportContent" column="ReportContent" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
