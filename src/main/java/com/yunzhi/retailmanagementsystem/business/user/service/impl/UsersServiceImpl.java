@@ -120,7 +120,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         if(newPassword == null || newPassword.isEmpty()){
             throw new BusinessException(ErrorCode.PARAM_ERROR, "新密码不能为空");
         }
-        user.setPassword(newPassword);
+        user.setPassword(DigestUtils.md5DigestAsHex((SALT + newPassword).getBytes()));
         updateById(user);
     }
 

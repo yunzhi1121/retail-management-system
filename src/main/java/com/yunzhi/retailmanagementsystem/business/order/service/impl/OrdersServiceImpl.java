@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.yunzhi.retailmanagementsystem.common.utils.coverter.VOConverter.convertToVO;
@@ -83,7 +84,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     @Transactional(rollbackFor = Exception.class)
     public void updateOrder(String orderId, OrderUpdateDTO dto) {
         Orders order = getValidOrder(orderId);
-        if (!OrderStatus.PENDING.getDescription().equals(order.getStatus())) {
+        if (!order.getStatus().equals("PENDING")) {
             throw new BusinessException(ErrorCode.ORDER_STATUS_CONFLICT, "只能修改待发货订单");
         }
 
@@ -113,7 +114,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     public void cancelOrder(String orderId) {
         // 1. 验证订单状态
         Orders order = getValidOrder(orderId);
-        if (!OrderStatus.PENDING.getDescription().equals(order.getStatus())) {
+        if (!order.getStatus().equals("PENDING")) {
             throw new BusinessException(ErrorCode.ORDER_STATUS_CONFLICT, "只允许取消待发货订单");
         }
 
@@ -122,7 +123,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         revertOldStock(orderGoods);
 
         // 3. 更新订单状态
-        order.setStatus(OrderStatus.CANCELLED.getDescription());
+        order.setStatus(OrderStatus.CANCELLED.toString());
         ordersMapper.updateById(order);
     }
 
@@ -132,8 +133,23 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         Customers customer = customersMapper.selectById(order.getCustomerId());
 
         List<OrderGood> orderGoods = orderGoodMapper.selectByOrderId(orderId);
+        // 批量查询商品信息，避免多次查询数据库
+        List<String> goodId = orderGoods.stream()
+                .map(OrderGood::getGoodId)
+                .collect(Collectors.toList());
+        Map<String, Goods> goodsMap = goodsMapper.selectBatchIds(goodId).stream()
+                .collect(Collectors.toMap(Goods::getGoodId, Function.identity()));
+
+        // 构建订单商品项列表
         List<OrderItemVO> items = orderGoods.stream()
-                .map(og -> new OrderItemVO(og.getGoodId(), "", null, og.getQuantity()))
+                .map(og -> {
+                    Goods good = goodsMap.get(og.getGoodId());
+                    if (good != null) {
+                        return new OrderItemVO(og.getGoodId(), good.getName(), good.getPrice(), og.getQuantity());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return new OrderDetailVO(order.getOrderId(), customer.getName(), items,
@@ -181,7 +197,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     }
 
     private Orders buildOrder(OrderCreateDTO dto, List<Goods> goodsList, Map<String, Integer> itemQuantities) {
-        return new Orders(UUID.randomUUID().toString(), dto.getCustomerId(), LocalDateTime.now(), OrderStatus.PENDING.getDescription(),
+        return new Orders(UUID.randomUUID().toString(), dto.getCustomerId(), LocalDateTime.now(), OrderStatus.PENDING.toString(),
                 calculateTotalAmount(goodsList, itemQuantities), dto.getPaymentMethod(),
                 dto.getDeliveryMethod(), dto.getRemarks());
     }

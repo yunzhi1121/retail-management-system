@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -67,7 +68,7 @@ public class ServiceRequestsServiceImpl extends ServiceImpl<ServiceRequestsMappe
         if (entity == null) {
             throw new BusinessException(ErrorCode.SERVICE_REQUEST_NOT_FOUND);
         }
-        if(entity.getStatus()=="COMPLETED"){
+        if(Objects.equals(entity.getStatus(), "COMPLETED")){
             throw new BusinessException(ErrorCode.SERVICE_REQUEST_COMPLETED);
         }
         // 更新状态和负责人
