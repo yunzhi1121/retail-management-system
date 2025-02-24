@@ -9,9 +9,9 @@
 
 ---
 #### 📚 文档导航
-- [系统设计文档](/docs/design.md)
+- [系统设计文档](/docs/1.系统设计/系统设计.md)
 - [API接口文档（Postman）](https://documenter.getpostman.com/view/41196335/2sAYdeKqxX)
-- [部署指南](/docs/deployment.md)
+- [部署指南](/docs/4.部署指南/部署指南.md)
 ---
 
 #### 🛠️ 技术栈
@@ -162,4 +162,4 @@
 
 ---
 
-**Star ⭐ 和 Fork** 是对项目最大的支持！如需要更详细的设计文档，请查看 [系统设计说明书](docs/DESIGN.md)
+**Star ⭐ 和 Fork** 是对项目最大的支持！如需要更详细的设计文档，请查看 [系统设计说明书](/docs/1.系统设计/系统设计.md)
