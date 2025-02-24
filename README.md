@@ -1,180 +1,165 @@
-# retail-management-system
-
-# 开发环境搭建详细指南
-
-## 1. 开发工具选择
-
-1. **集成开发环境（IDE）**
-    - 使用 [IntelliJ IDEA](https://www.jetbrains.com/idea/)。
-    - 安装后，配置 Java 开发插件以提高开发效率。
+### 📦 物流进销存管理系统
 
 ---
 
-## 2. 安装 Java 开发工具包（JDK）
+#### 🌟 项目简介
+一个基于 **Spring Boot + MyBatis Plus** 构建的物流进销存全流程管理系统，涵盖客户管理、商品库存、订单跟踪、服务请求处理、多维度报表分析等功能模块。采用模块化分层架构，支持高内聚低耦合的业务扩展，集成 **JWT 鉴权** 与 **RBAC 动态权限控制**，为企业级应用提供安全可靠的后台管理能力。
 
-1. 下载 [Java SE Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-downloads.html)。
-    - 确保选择版本 11 或更高。
+**GitHub 地址**：[项目链接](https://github.com/yunzhi1121/retail-management-system)  
 
-2. 安装 JDK 并配置环境变量：
-    - 在系统中设置 `JAVA_HOME` 为 JDK 的安装路径。
-    - 将 `JAVA_HOME/bin` 添加到 `PATH` 环境变量中。
+---
 
-3. 验证安装：
+#### 🛠️ 技术栈
+| 类别             | 技术/框架                                                    |
+|------------------|----------------------------------------------------------|
+| **核心框架**     | Spring Boot 2.6.13, MyBatis Plus 3.5, Spring Security 5.6 |
+| **安全认证**     | JWT 令牌鉴权、自定义权限注解（`@RequiresPermission`）                  |
+| **数据库**       | MySQL 8.0                                                |
+| **工具类库**     | Lombok,  Hibernate Validator                             |
+| **其他**         | Swagger 3.0（API 文档）、RSA 加密                               |
+
+---
+
+#### 📂 功能模块
+| 模块             | 核心功能                                                                 |
+|------------------|--------------------------------------------------------------------------|
+| **用户权限**     | 多角色动态权限分配（管理员/操作员/客户）、JWT 登录态管理                |
+| **订单管理**     | 订单创建-支付-发货全流程、支持批量操作与状态追踪                        |
+| **库存管理**     | 商品出入库记录、库存快照版本控制                          |
+| **报表分析**     | 销售数据可视化、客户行为分析、库存周转率统计                            |
+| **服务跟踪**     | 工单处理流程闭环                                          | 
+
+---
+
+#### 🏗️ 系统架构
+```plaintext
+┌──────────────────────────────┐
+│         API Gateway          │  # 前后端分离入口（未来扩展为Spring Cloud Gateway）
+└──────────────────────────────┘
+               │
+┌──────────────────────────────┐
+│    Spring Security Filter    │  # JWT 鉴权与动态权限拦截
+└──────────────────────────────┘
+               │
+┌───────────────────────────────────────────┐
+│           Business Modules                │  # 模块化拆分（用户/订单/库存/报表等）
+│   ┌─────────┐  ┌─────────┐  ┌─────────┐   │
+│   │  Order  │  │  Goods  │  │  User   │   │
+│   └─────────┘  └─────────┘  └─────────┘   │
+└───────────────────────────────────────────┘
+               │
+┌──────────────────────────────┐
+│   MyBatis Plus + MySQL       │  # 数据持久层（未来支持分库分表）
+└──────────────────────────────┘
+```
+
+---
+
+#### 🔥 核心特性
+1. **精细化权限控制**
+    - 基于 `@RequiresPermission` 注解实现方法级权限拦截
+    - 动态角色权限绑定（通过 `role_permission` 表实时生效）
+
+
+2. **标准化 API 设计**
+    - RESTful 风格接口，统一响应格式（`BaseResponse<T>`）
+   ```json
+   {
+     "code": 200,
+     "data": { ... },      // 业务数据
+     "message": "success"  // 友好提示
+     "description": "..."  // 提示详细描述
+   }
+   ```
+
+3. **分布式设计预留**
+    - 模块化结构支持快速拆分为微服务（已预留 Spring Cloud 依赖）
+    - 数据库表设计包含分片键（如 `user_id` 作为哈希分片依据）
+
+---
+
+#### 🚀 快速开始
+1. **环境要求**
+    - JDK 17+, MySQL 8.0, Maven 3.6+
+
+2. **初始化步骤**
    ```bash
-   java -version
-   ```
-   输出应显示所安装的 JDK 版本。
+   # 克隆项目
+   git clone https://github.com/yunzhi1121/retail-management-system.git
 
----
+   # 导入数据库
+   mysql -u root -p < docs/sql/init.sql
 
-## 3. 配置构建工具
-
-1. **选择构建工具：**
-    - 使用 Maven。
-
-2. **安装 Maven：**
-    - 下载 [Maven](https://maven.apache.org/download.cgi)。
-    - 解压并配置环境变量 `MAVEN_HOME` 和 `PATH`。
-    - 验证安装：
-      ```bash
-      mvn -version
-      ```
-
----
-
-## 4. 版本控制系统
-
-1. 安装 [Git](https://git-scm.com/):
-    - 配置用户信息：
-      ```bash
-      $ git -v //查看版本
-      
-      $ git config user.name yunzhi1121    //给当前件配置
-      $ git config user.email yunzhi1121@qq.com    /给当前文件配置
-      $ git config --global user.name yunzhi1121    /全局配置
-      $ git config --global user.email yunzhi1121@qqcom    //全局配置
- 
-      ```
-
-2. 配置远程仓库：
-    - 注册 [GitHub](https://github.com/) 。
-    - 生成 SSH 密钥并添加到远程仓库：
-      ```bash
-      ssh-keygen -t rsa -b 4096 -C "youremail@example.com"
-      ```
-      将生成的公钥（`~/.ssh/id_rsa.pub`）添加到 GitHub/GitLab 中。
-
-      ```bash
-      $ git clone https://github.com/yunzhi1121/retail-management-system
-      ```
-
-3. 验证连接：
-   ```bash
-   ssh -T git@github.com
+   # 启动应用（默认端口8080）
+   mvn spring-boot:run
    ```
 
----
-
-## 5. 数据库配置
-
-1. **安装数据库系统**
-    - 使用 MySQL。
-
-2. **MySQL 安装指南：**
-    - 下载 [MySQL](https://dev.mysql.com/downloads/mysql/) 并安装。
-    - 设置 root 用户密码。
-    - 启动服务并验证连接：
-      ```bash
-      mysql -u root -p
-      ```
-
-3. **创建开发数据库：**
-   ```sql
-   CREATE DATABASE my_project_db;
-   ```
+3. **访问接口文档**  
+   访问 `http://localhost:8080/swagger-ui.html` 查看 API 详情
 
 ---
 
-## 6. 后端框架设置
+#### 📈 项目亮点
+- **代码规范性强**：严格遵循阿里巴巴 Java 开发规范
+- **全链路异常处理**：自定义 `BusinessException` + 全局拦截器 `GlobalExceptionHandler`
 
-  初始化 Spring Boot 项目：
- - 使用 [Spring Initializr](https://start.spring.io/)：
-     - 选择 Maven
-     - 添加依赖：Spring Web、Spring Security、MySQL Driver。
+
+
+
+
+
+
+---
+#### 📌 未来计划
+- **分布式改造**
+   - 基于 Spring Cloud Alibaba 实现微服务拆分（Nacos/Sentinel）
+   - 集成 Seata AT 模式解决跨服务事务（如订单创建与库存扣减）
+
+- **性能优化**
+   - 部署 Elasticsearch 集群，实现订单日志全文检索（响应时间 <50ms）
+   - 构建 Redis 多级缓存体系：  
+     ▪️ 本地缓存（Caffeine）  
+     ▪️ 分布式缓存（Redisson 集群锁）
+   - 引入 Kafka 异步处理库存变更消息，支撑万级并发
+
+- **监控告警**
+   - Prometheus + Grafana 监控 JVM/DB 核心指标
+   - 集成 SkyWalking 实现全链路追踪
+   - 配置 Sentinel 熔断策略（DB响应>1s时自动降级）
+
+- **可扩展性设计**
+   - 通过 MapStruct 自动生成 DTO/PO/VO 转换器
+   - 字段扩展零改造策略（接口层与持久层解耦）
+
+- **代码规范性**
+   - 强制 CheckStyle 代码规范检查（缩进/命名/注释）
+   - SonarQube 质量门禁（BUG≤3，漏洞零容忍）
+
+- **日志记录**
+   - 敏感操作全审计（密码修改/权限变更记录脱敏存储）
+   - 操作日志保留周期 ≥6 个月
+
+- **高性能数据交互**
+   - 接口响应时间 <200ms（单次请求）
+   - 热点数据预加载策略（商品信息/权限列表实时缓存）
+
+- **实时库存预警**
+   - 安全库存阈值动态扫描（低于阈值时触发）
+   - 企业微信机器人实时告警（30分钟内响应）
+
+
+
+
+
+
+
+
 
 ---
 
-## 7. 容器化技术
-
-1. 安装 [Docker](https://www.docker.com/)。
-    
-
-2. IDEA安装Docker插件
-打开 IntelliJ IDEA，点击菜单栏中的 "File" -> "Settings"（或 "IntelliJ IDEA" -> "Preferences"），在左侧栏中选择 "Plugins"，搜索并安装 "Docker" 插件。
-![alt text](https://www.helloimg.com/i/2024/12/23/6768447d57492.png)
-
-
-1. IDEA连接Docker
-   1. Docker for Windows 连接
-"Docker for Windows" 是指在 Windows 操作系统上运行 Docker 容器；
-
-   1. SSH 连接
-"SSH 连接" 用什么用户下载docker，就用什么用户连接SSH;
-
-     1. Connection successful 连接成功
-如下图进行连接测试看看是否能和docker的宿主机连接成功，输入正确的地址后下方会自动显示连接成功的说明。
-![alt text](
-https://www.helloimg.com/i/2024/12/23/6768447d7eaff.png)
-
-
-4. 查看Docker面板
-配置好了docker插件后，会在项目服务（services）下面生成一个Docker面板，可以看到docker中的镜像和容器。
-
-
-
-5. 使用插件生成镜像
-使用插件生成镜像，点击当前文件（currentfile），选择编辑配置，添加新的运行配置找到docker，有docker Image，docker-compose，dockerfile三种选择；
-
-![alt text](https://www.helloimg.com/i/2024/12/23/6768447ce2a10.png
-)
-原文链接：https://blog.csdn.net/m0_67906358/article/details/132261668
+#### 📜 开源协议
+[MIT License](LICENSE)
 
 ---
 
-## 8. 持续集成/持续部署（CI/CD）
-
-1. 使用 GitHub Actions 配置 CI/CD 流程：
-    - 创建 `.github/workflows/main.yml`：
-      ```yaml
-      name: CI/CD Pipeline
- 
-      on:
-        push:
-          branches:
-            - main
- 
-      jobs:
-        build:
-          runs-on: ubuntu-latest
-          steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
- 
-            - name: Set up JDK 21
-              uses: actions/setup-java@v3
-              with:
-                java-version: '21'
- 
-            - name: Build with Maven
-              run: mvn clean install
- 
-            - name: Deploy to Docker Hub
-              if: github.ref == 'refs/heads/main'
-              run: |
-                docker build -t my-repo/my-project:latest .
-                echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-                docker push my-repo/my-project:latest
-      ```
-
-2. 配置 GitHub Secrets：
-    - 添加 `DOCKER_USERNAME` 和 `DOCKER_PASSWORD`。
+**Star ⭐ 和 Fork** 是对项目最大的支持！如需要更详细的设计文档，请查看 [系统设计说明书](docs/DESIGN.md)

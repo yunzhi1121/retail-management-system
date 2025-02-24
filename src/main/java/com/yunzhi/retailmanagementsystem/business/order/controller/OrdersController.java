@@ -17,6 +17,11 @@ import com.yunzhi.retailmanagementsystem.common.model.response.ResultUtils;
 import com.yunzhi.retailmanagementsystem.common.security.authorization.RequiresPermission;
 import com.yunzhi.retailmanagementsystem.common.utils.coverter.VOConverter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,44 +44,99 @@ import java.util.stream.Collectors;
 public class OrdersController {
     @Autowired
     private OrdersService ordersService;
-    @Autowired
-    private CustomersService customersService;
 
-    //━━━━━━━━━━━━━━ 端点实现 ━━━━━━━━━━━━━━
-    @Operation(summary = "创建订单")
+    @Operation(summary = "创建订单", description = "根据传入的订单创建信息创建一个新的订单")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "订单创建成功",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "请求参数错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)))
+    })
     @PostMapping("/add")
     @RequiresPermission(Permission.ORDERS_CREATE)
-    public ResponseEntity<BaseResponse<OrderVO>> createOrder(@RequestBody @Valid OrderCreateDTO dto) throws Exception {
+    public ResponseEntity<BaseResponse<OrderVO>> createOrder(@RequestBody @Valid @Parameter(description = "订单创建信息", required = true) OrderCreateDTO dto) throws Exception {
         return ResponseEntity.ok(ResultUtils.success(ordersService.createOrder(dto), "订单创建成功"));
     }
 
-    @Operation(summary = "更新订单")
+    @Operation(summary = "更新订单", description = "根据订单 ID 和传入的更新信息更新订单")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "订单修改成功",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "400", description = "请求参数错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定订单",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)))
+    })
     @PutMapping("/{orderId}")
     @RequiresPermission(Permission.ORDERS_UPDATE)
-    public ResponseEntity<BaseResponse<Void>> updateOrder(@PathVariable String orderId, @RequestBody @Valid OrderUpdateDTO dto) throws Exception {
+    public ResponseEntity<BaseResponse<Void>> updateOrder(@PathVariable @Parameter(description = "订单 ID", required = true) String orderId, @RequestBody @Valid @Parameter(description = "订单更新信息", required = true) OrderUpdateDTO dto) throws Exception {
         ordersService.updateOrder(orderId, dto);
         return ResponseEntity.ok(ResultUtils.success("订单修改成功"));
     }
 
-    @Operation(summary = "获取订单详情")
+    @Operation(summary = "获取订单详情", description = "根据订单 ID 获取订单的详细信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "获取订单详情成功",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定订单",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)))
+    })
     @GetMapping("/{orderId}")
     @RequiresPermission(Permission.ORDERS_READ)
-    public ResponseEntity<BaseResponse<OrderDetailVO>> getOrderDetail(@PathVariable @NotBlank String orderId) {
+    public ResponseEntity<BaseResponse<OrderDetailVO>> getOrderDetail(@PathVariable @NotBlank @Parameter(description = "订单 ID", required = true) String orderId) {
         return ResponseEntity.ok(ResultUtils.success(ordersService.getOrderDetail(orderId), "获取订单详情成功"));
     }
 
-    @Operation(summary = "取消订单")
+    @Operation(summary = "取消订单", description = "根据订单 ID 取消指定的订单")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "订单已取消",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定订单",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)))
+    })
     @DeleteMapping("/{orderId}")
     @RequiresPermission(Permission.ORDERS_UPDATE)
-    public ResponseEntity<BaseResponse<Void>> cancelOrder(@PathVariable @NotBlank String orderId) {
+    public ResponseEntity<BaseResponse<Void>> cancelOrder(@PathVariable @NotBlank @Parameter(description = "订单 ID", required = true) String orderId) {
         ordersService.cancelOrder(orderId);
         return ResponseEntity.ok(ResultUtils.success("订单已取消"));
     }
 
-    @Operation(summary = "获取客户订单列表")
+    @Operation(summary = "获取客户订单列表", description = "根据客户 ID 获取该客户的所有订单列表")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "客户订单列表获取成功",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "404", description = "未找到指定客户的订单",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BaseResponse.class)))
+    })
     @GetMapping("/customer/{customerId}")
     @RequiresPermission(Permission.ORDERS_READ)
-    public ResponseEntity<BaseResponse<List<OrderVO>>> getCustomerOrders(@PathVariable @NotBlank String customerId) {
+    public ResponseEntity<BaseResponse<List<OrderVO>>> getCustomerOrders(@PathVariable @NotBlank @Parameter(description = "客户 ID", required = true) String customerId) {
         return ResponseEntity.ok(ResultUtils.success(ordersService.getCustomerOrders(customerId), "客户订单列表获取成功"));
     }
 }

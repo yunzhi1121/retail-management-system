@@ -1,6 +1,5 @@
 package com.yunzhi.retailmanagementsystem.business.order.mapper;
 
-import com.yunzhi.retailmanagementsystem.business.order.model.po.OrderGood;
 import com.yunzhi.retailmanagementsystem.business.order.model.po.Orders;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;

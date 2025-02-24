@@ -37,7 +37,7 @@ public class WebSecurityCoreConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 无状态会话
                 .and()
             .authorizeRequests()
-                .antMatchers("/users/login", "/users/register").permitAll() // 公开接口
+                .antMatchers("/users/login", "/users/register", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // 公开接口
                 .anyRequest().authenticated() // 其他接口需认证
                 .and()
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 添加JWT过滤器
