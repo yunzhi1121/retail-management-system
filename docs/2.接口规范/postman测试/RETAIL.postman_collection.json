@@ -1,0 +1,3023 @@
+{
+	"info": {
+		"_postman_id": "2869fc1e-6891-47c9-a4c0-12401b15e121",
+		"name": "0 RETAIL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41196335"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Login-Admin-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含token字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.token) {\r",
+									"    // 获取token值\r",
+									"    var token = jsonData.data.token;\r",
+									"    \r",
+									"    // 设置adminToken环境变量\r",
+									"    pm.environment.set(\"adminToken\", token);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"adminToken环境变量已设置为: \", token);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含token，打印错误日志\r",
+									"    console.error(\"响应体中未找到token\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"testPassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login-inventoryAdmin-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含token字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.token) {\r",
+									"    // 获取token值\r",
+									"    var token = jsonData.data.token;\r",
+									"    \r",
+									"    // 设置inventoryToken环境变量\r",
+									"    pm.environment.set(\"inventoryToken\", token);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"inventoryToken环境变量已设置为: \", token);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含token，打印错误日志\r",
+									"    console.error(\"响应体中未找到token\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"inventory\",\r\n  \"password\": \"testPassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-User-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含userId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.userId) {\r",
+									"    // 获取userId值\r",
+									"    var userId = jsonData.data.userId;\r",
+									"\r",
+									"    // 设置userId环境变量\r",
+									"    pm.environment.set(\"userId\", userId);\r",
+									"\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"userId环境变量已设置为: \", userId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含userId，打印错误日志\r",
+									"    console.error(\"响应体中未找到userId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"test_user\",\r\n  \"role\": \"CUSTOMER_ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-User-Failure-MissingUsername",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"role\": \"CUSTOMER_ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-User-Failure-InvalidRole",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"invalid_role_user\",\r\n  \"role\": \"INVALID_ROLE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-User-Failure-NoPermission",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"no_perm_user\",\r\n  \"role\": \"CUSTOMER_ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login-User-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含token字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.token) {\r",
+									"    // 获取token值\r",
+									"    var token = jsonData.data.token;\r",
+									"    \r",
+									"    // 设置userToken环境变量\r",
+									"    pm.environment.set(\"userToken\", token);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"userToken环境变量已设置为: \", token);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含token，打印错误日志\r",
+									"    console.error(\"响应体中未找到token\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"old_user\",\r\n  \"password\": \"testPassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login-Failure-WrongPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"old_user\",\r\n  \"password\": \"wrong_pass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Username-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"newUsername\": \"updated_user\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/old_userID/username",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"old_userID",
+								"username"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Username-Failure-Empty",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"newUsername\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/old_userID/username",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"old_userID",
+								"username"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Password-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"oldPassword\": \"testPassword\",\r\n  \"newPassword\": \"new_password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/old_userID/password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"old_userID",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Password-Failure-WrongOld",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"oldPassword\": \"wrong_old_pass\",\r\n  \"newPassword\": \"new_pass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/old_userID/password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"old_userID",
+								"password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign-Role-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"role\": \"SALES_ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/old_userID/role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"old_userID",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign-Role-Failure-InvalidRole",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"role\": \"INVALID_ROLE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"role"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Create-Customer-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含customerId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.customerId) {\r",
+									"    // 获取customerId值\r",
+									"    var customerId = jsonData.data.customerId;\r",
+									"\r",
+									"    \r",
+									"    // 设置customerId环境变量\r",
+									"    pm.environment.set(\"customerId\", customerId);\r",
+									"\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"customerId环境变量已设置为: \", customerId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含customerId，打印错误日志\r",
+									"    console.error(\"响应体中未找到customerId\");\r",
+									"}\r",
+									"\r",
+									"if (jsonData && jsonData.data && jsonData.data.customerId) {\r",
+									"    var email = jsonData.data.email;\r",
+									"    \r",
+									"    pm.environment.set(\"customerEmail\", email);\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"customerEmail环境变量已设置为: \", email);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含email，打印错误日志\r",
+									"    console.error(\"响应体中未找到email\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"王五\",\r\n  \"email\": \"wangwu@qq.com\",\r\n  \"phone\": \"13800000003\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Customer-Failure-MissingName",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"empty_name@test.com\",\r\n  \"phone\": \"13800000004\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Customer-Failure-DuplicateEmail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"重复邮箱测试\",\r\n  \"email\": \"zhangsan@test.com\", \r\n  \"phone\": \"13800000005\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Customer-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"\r",
+									"if (jsonData && jsonData.data && jsonData.data.customerId) {\r",
+									"    var email = jsonData.data.email;\r",
+									"    \r",
+									"    pm.environment.set(\"customerEmail\", email);\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"customerEmail环境变量已设置为: \", email);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含email，打印错误日志\r",
+									"    console.error(\"响应体中未找到email\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"张三（已更新）\",\r\n  \"email\": \"new_zhang@test.com\",\r\n  \"phone\": \"13900000001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/cust1_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"cust1_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Customer-Failure-NotFound",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"不存在的客户\",\r\n  \"email\": \"not_found@test.com\",\r\n  \"phone\": \"13800000006\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/invalid_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"invalid_id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Customer-ByID-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers?customerId=cust2_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers"
+							],
+							"query": [
+								{
+									"key": "customerId",
+									"value": "cust2_ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Customer-ByEmail-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers?email=lisi@test.com",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "lisi@test.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Customer-Failure-NoParams",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Good",
+			"item": [
+				{
+					"name": "Create-Goods-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含goodId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.goodId) {\r",
+									"    // 获取goodId值\r",
+									"    var goodId = jsonData.data.goodId;\r",
+									"\r",
+									"    \r",
+									"    // 设置goodId环境变量\r",
+									"    pm.environment.set(\"goodId\", goodId);\r",
+									"\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"goodId环境变量已设置为: \", goodId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含goodId，打印错误日志\r",
+									"    console.error(\"响应体中未找到goodId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"大疆无人机\",\r\n  \"description\": \"专业航拍设备\",\r\n  \"quantity\": 30,\r\n  \"price\": 8999.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/goods/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Goods-Failure-MissingName",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含goodId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.goodId) {\r",
+									"    // 获取goodId值\r",
+									"    var goodId = jsonData.data.goodId;\r",
+									"\r",
+									"    \r",
+									"    // 设置goodId环境变量\r",
+									"    pm.environment.set(\"goodId\", goodId);\r",
+									"\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"goodId环境变量已设置为: \", goodId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含goodId，打印错误日志\r",
+									"    console.error(\"响应体中未找到goodId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"无名商品\",\r\n  \"quantity\": 10,\r\n  \"price\": 100.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/goods/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Goods-Failure-DuplicateName",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含goodId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.goodId) {\r",
+									"    // 获取goodId值\r",
+									"    var goodId = jsonData.data.goodId;\r",
+									"\r",
+									"    \r",
+									"    // 设置goodId环境变量\r",
+									"    pm.environment.set(\"goodId\", goodId);\r",
+									"\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"goodId环境变量已设置为: \", goodId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含goodId，打印错误日志\r",
+									"    console.error(\"响应体中未找到goodId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"iPhone 15\", \r\n  \"description\": \"重复名称测试\",\r\n  \"quantity\": 5,\r\n  \"price\": 7999.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/goods/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Goods-Failure-InvalidPrice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含goodId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.goodId) {\r",
+									"    // 获取goodId值\r",
+									"    var goodId = jsonData.data.goodId;\r",
+									"\r",
+									"    \r",
+									"    // 设置goodId环境变量\r",
+									"    pm.environment.set(\"goodId\", goodId);\r",
+									"\r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"goodId环境变量已设置为: \", goodId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含goodId，打印错误日志\r",
+									"    console.error(\"响应体中未找到goodId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"测试商品\",\r\n  \"description\": \"无效价格测试\",\r\n  \"quantity\": 10,\r\n  \"price\": -100.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/goods/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Goods-Successfully Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"iPhone 15 Pro\",\r\n  \"description\": \"最新旗舰智能手机\",\r\n  \"quantity\": 20,\r\n  \"price\": 9999.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/goods/g1_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"g1_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Goods-Failure-NotFound",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"不存在的商品\",\r\n  \"quantity\": 1,\r\n  \"price\": 10.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/goods/invalid_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"invalid_id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Goods-ByID-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goods/g2_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"g2_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Goods-ByID-Failure-NotFound",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goods/non_exist_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods",
+								"non_exist_id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search-Goods-ByName-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goods?name=电视",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "电视"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search-Goods-ByPriceRange-Success",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goods?minPrice=5000&maxPrice=8000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "5000"
+								},
+								{
+									"key": "maxPrice",
+									"value": "8000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search-Goods-InvalidPriceRange",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goods?minPrice=8000&maxPrice=5000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "8000"
+								},
+								{
+									"key": "maxPrice",
+									"value": "5000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pagination-Goods-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/goods?page=2&pageSize=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"goods"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "pageSize",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Add-Inventory-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/add?goodID=g1_ID&quantity=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"add"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "g1_ID"
+								},
+								{
+									"key": "quantity",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add-Inventory-Failure-NotFound",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/add?goodID=invalid_id&quantity=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"add"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "invalid_id"
+								},
+								{
+									"key": "quantity",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add-Inventory-Failure-InvalidQty",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/add?goodID=g1_ID&quantity=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"add"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "g1_ID"
+								},
+								{
+									"key": "quantity",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reduce-Inventory-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/reduce?goodID=g2_ID&quantity=30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"reduce"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "g2_ID"
+								},
+								{
+									"key": "quantity",
+									"value": "30"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reduce-Inventory-Failure-Overstock",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/reduce?goodID=low1_ID&quantity=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"reduce"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "low1_ID"
+								},
+								{
+									"key": "quantity",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reduce-Inventory-Failure-NotFound",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/reduce?goodID=invalid_id&quantity=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"reduce"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "invalid_id"
+								},
+								{
+									"key": "quantity",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Inventory-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/status?goodID=g3_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"status"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "g3_ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Inventory-Failure-NotFound",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/status?goodID=non_exist",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inventory",
+								"status"
+							],
+							"query": [
+								{
+									"key": "goodID",
+									"value": "non_exist"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create-Order-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含orderId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.orderId) {\r",
+									"    // 获取orderId值\r",
+									"    var orderId = jsonData.data.orderId;\r",
+									"    \r",
+									"    // 设置orderId环境变量\r",
+									"    pm.environment.set(\"orderId\", orderId);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"orderId环境变量已设置为: \", orderId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含orderId，打印错误日志\r",
+									"    console.error(\"响应体中未找到orderId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"cust1_ID\",\r\n  \"items\": [\r\n    {\"goodId\": \"g1_ID\", \"quantity\": 2},\r\n    {\"goodId\": \"g2_ID\", \"quantity\": 1}\r\n  ],\r\n  \"paymentMethod\": \"支付宝\",\r\n  \"deliveryMethod\": \"快递\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Order-Failure-InvalidCustomer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含orderId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.orderId) {\r",
+									"    // 获取orderId值\r",
+									"    var orderId = jsonData.data.orderId;\r",
+									"    \r",
+									"    // 设置orderId环境变量\r",
+									"    pm.environment.set(\"orderId\", orderId);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"orderId环境变量已设置为: \", orderId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含orderId，打印错误日志\r",
+									"    console.error(\"响应体中未找到orderId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"invalid_cust\",\r\n  \"items\": [{\"goodId\": \"g1_ID\", \"quantity\": 1}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Order-Failure-InsufficientStock",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含orderId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.orderId) {\r",
+									"    // 获取orderId值\r",
+									"    var orderId = jsonData.data.orderId;\r",
+									"    \r",
+									"    // 设置orderId环境变量\r",
+									"    pm.environment.set(\"orderId\", orderId);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"orderId环境变量已设置为: \", orderId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含orderId，打印错误日志\r",
+									"    console.error(\"响应体中未找到orderId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"cust1_ID\",\r\n  \"items\": [{\"goodId\": \"g2_ID\", \"quantity\": 60}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Order-Detail-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/order1_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"order1_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Order-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"items\": [\r\n    {\"goodId\": \"g1_ID\", \"quantity\": 3},\r\n    {\"goodId\": \"g3_ID\", \"quantity\": 2}\r\n  ],\r\n  \"paymentMethod\": \"微信支付\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/order4_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"order4_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update-Order-Failure-ShippedOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"items\": [\r\n    {\"goodId\": \"g1_ID\", \"quantity\": 3},\r\n    {\"goodId\": \"g2_ID\", \"quantity\": 2}\r\n  ],\r\n  \"paymentMethod\": \"微信支付\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/order2_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"order2_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Customer-Orders-Successfully Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/customer/cust1_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"customer",
+								"cust1_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel-Order-Successfully",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含orderId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.orderId) {\r",
+									"    // 获取orderId值\r",
+									"    var orderId = jsonData.data.orderId;\r",
+									"    \r",
+									"    // 设置orderId环境变量\r",
+									"    pm.environment.set(\"orderId\", orderId);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"orderId环境变量已设置为: \", orderId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含orderId，打印错误日志\r",
+									"    console.error(\"响应体中未找到orderId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"invalid_cust\",\r\n  \"items\": [{\"goodId\": \"g1\", \"quantity\": 1}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/order5_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"order5_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel-Order-Failure-CompletedOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// 检查响应状态码是否为200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// 解析响应体为JSON对象\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 检查响应体中是否包含data对象，并且data对象中是否包含orderId字段\r",
+									"if (jsonData && jsonData.data && jsonData.data.orderId) {\r",
+									"    // 获取orderId值\r",
+									"    var orderId = jsonData.data.orderId;\r",
+									"    \r",
+									"    // 设置orderId环境变量\r",
+									"    pm.environment.set(\"orderId\", orderId);\r",
+									"    \r",
+									"    // 打印日志，确认环境变量已设置\r",
+									"    console.log(\"orderId环境变量已设置为: \", orderId);\r",
+									"} else {\r",
+									"    // 如果响应体中不包含orderId，打印错误日志\r",
+									"    console.error(\"响应体中未找到orderId\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"invalid_cust\",\r\n  \"items\": [{\"goodId\": \"g1\", \"quantity\": 1}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/order3_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"order3_ID"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Report",
+			"item": [
+				{
+					"name": "Sales-Report-Successfully Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2024-03-01\",\r\n  \"endDate\": \"2024-03-31\",\r\n  \"analysisType\": \"DAILY\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reports/sales",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"sales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inventory-Report-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"threshold\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reports/inventory",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer-Report-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2024-03-01\",\r\n  \"endDate\": \"2024-03-31\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reports/customer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"customer"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Query-Reports-Successfully",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reports/query?page=1&pageSize=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"query"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid-DateRange-Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"startDate\": \"2024-03-31\",\r\n  \"endDate\": \"2024-03-01\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reports/sales",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reports",
+								"sales"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Request",
+			"item": [
+				{
+					"name": "Create-Request-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"cust1_ID\",\r\n  \"title\": \"按键失灵维修\",\r\n  \"description\": \"手机音量键无法正常使用\",\r\n  \"requestType\": \"HARDWARE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/service-requests/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"service-requests",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Request-Failure-NoCustomer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"customerId\": \"invalid_cust\",\r\n  \"title\": \"无效客户测试\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/service-requests/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"service-requests",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Request-Details-Successfully",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/service-requests/req1_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"service-requests",
+								"req1_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Request-Failure-NotFound",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/service-requests/invalid_req",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"service-requests",
+								"invalid_req"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process-Request-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"targetStatus\": \"COMPLETED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/service-requests/req1_ID/process",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"service-requests",
+								"req1_ID",
+								"process"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process-Request-Failure-Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"targetStatus\": \"PROCESSING\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/service-requests/req1_ID/process",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"service-requests",
+								"req1_ID",
+								"process"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Track",
+			"item": [
+				{
+					"name": "Create-Tracking-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"orderId\": \"order1_ID\",\r\n  \"location\": \"上海分拣中心\",\r\n  \"timestamp\": \"2024-03-20T10:00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tracking/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tracking",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Tracking-Failure-NoOrder",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"orderId\": \"invalid_order\",\r\n  \"location\": \"测试节点\",\r\n  \"timestamp\": \"2024-03-20T11:00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tracking/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tracking",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-Tracking-Failure-MissingField",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"orderId\": \"order_ID\",\r\n  \"location\": \"测试节点\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tracking/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tracking",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Tracking-ByOrder-Successfully",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tracking/order/order1_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tracking",
+								"order",
+								"order1_ID"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get-Tracking-NoRecords",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tracking/order/order3_ID",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tracking",
+								"order",
+								"order3_ID"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
