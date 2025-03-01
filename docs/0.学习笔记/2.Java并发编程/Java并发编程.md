@@ -263,7 +263,7 @@ public class TestFrames {
 }
 ```
 
-![alt text](../image/Java并发编程/image-1.png)
+![alt text](../0.image/Java并发编程/image-1.png)
 
 1. **线程启动**：JVM 为线程分配独立的程序计数器、虚拟机栈和本地方法栈。
 2. **方法调用**：从栈顶压入一个新的栈帧，包含：
@@ -496,7 +496,7 @@ private static void test2() throws InterruptedException {
 }
 ```
 
-![alt text](../image/Java并发编程/image-2.png)
+![alt text](../0.image/Java并发编程/image-2.png)
 
 #### 3.8.3. 有时效的join
 
@@ -582,7 +582,7 @@ public static void test3() throws InterruptedException {
 
 ✅两阶段终止模式
 
-![alt text](../image/Java并发编程/image-3.png)
+![alt text](../0.image/Java并发编程/image-3.png)
 
 ```java
 class TPTInterrupt {
