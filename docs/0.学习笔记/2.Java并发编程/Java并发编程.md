@@ -1,6 +1,6 @@
 ## 1. 概览
 
-![alt text](../image/Java并发编程/image.png)
+![alt text](../0.image/Java并发编程/image.png)
 
 ## 2. 进程 & 线程
 
